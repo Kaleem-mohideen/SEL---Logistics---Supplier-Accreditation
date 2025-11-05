@@ -1,0 +1,34 @@
+[
+  {
+    "model": "staff.functioncode",
+    "pk": 1,
+    "fields": {
+      "code": "LOG01",
+      "description": "Logistic Crew"
+    }
+  },
+  {
+    "model": "staff.functioncode",
+    "pk": 2,
+    "fields": {
+      "code": "LOG02",
+      "description": "Logistic Supervisor"
+    }
+  },
+  {
+    "model": "staff.functioncode",
+    "pk": 3,
+    "fields": {
+      "code": "LOG03",
+      "description": "Logistic Driver"
+    }
+  },
+  {
+    "model": "staff.functioncode",
+    "pk": 4,
+    "fields": {
+      "code": "LOG15",
+      "description": "Doping Driver"
+    }
+  }
+]

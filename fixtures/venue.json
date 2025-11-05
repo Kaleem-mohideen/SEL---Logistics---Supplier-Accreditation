@@ -1,0 +1,234 @@
+[
+  {
+    "model": "staff.venue",
+    "pk": 1,
+    "fields": {
+      "code": "ABA",
+      "name": "Anterselva Biathlon Arena"
+    }
+  },
+  {
+    "model": "staff.venue",
+    "pk": 2,
+    "fields": {
+      "code": "CAL",
+      "name": "Tofane Alpine Skiing Centre"
+    }
+  },
+  {
+    "model": "staff.venue",
+    "pk": 3,
+    "fields": {
+      "code": "CCU",
+      "name": "Cortina Curling Olympic Stadium"
+    }
+  },
+  {
+    "model": "staff.venue",
+    "pk": 4,
+    "fields": {
+      "code": "CSB",
+      "name": "Cortina Para Snowboard Park"
+    }
+  },
+  {
+    "model": "staff.venue",
+    "pk": 5,
+    "fields": {
+      "code": "CSC",
+      "name": "Cortina Sliding Centre"
+    }
+  },
+  {
+    "model": "staff.venue",
+    "pk": 6,
+    "fields": {
+      "code": "LAM",
+      "name": "Livigno Aerials & Moguls Park"
+    }
+  },
+  {
+    "model": "staff.venue",
+    "pk": 7,
+    "fields": {
+      "code": "LSP",
+      "name": "Livigno Snow Park"
+    }
+  },
+  {
+    "model": "staff.venue",
+    "pk": 8,
+    "fields": {
+      "code": "MH1",
+      "name": "Milano Santagiulia Ice Hockey Arena"
+    }
+  },
+  {
+    "model": "staff.venue",
+    "pk": 9,
+    "fields": {
+      "code": "MH2",
+      "name": "Milano Rho Ice Hockey Arena"
+    }
+  },
+  {
+    "model": "staff.venue",
+    "pk": 10,
+    "fields": {
+      "code": "MSK",
+      "name": "Milano Ice Skating Arena"
+    }
+  },
+  {
+    "model": "staff.venue",
+    "pk": 11,
+    "fields": {
+      "code": "MSS",
+      "name": "Milano Speed Skating Stadium"
+    }
+  },
+  {
+    "model": "staff.venue",
+    "pk": 12,
+    "fields": {
+      "code": "PSJ",
+      "name": "Predazzo Ski Jumping Stadium"
+    }
+  },
+  {
+    "model": "staff.venue",
+    "pk": 13,
+    "fields": {
+      "code": "SSC",
+      "name": "Stelvio Ski Centre"
+    }
+  },
+  {
+    "model": "staff.venue",
+    "pk": 14,
+    "fields": {
+      "code": "TCC",
+      "name": "Tesero Cross-Country Skiing Stadium"
+    }
+  },
+  {
+    "model": "staff.venue",
+    "pk": 15,
+    "fields": {
+      "code": "OVA",
+      "name": "Anterselva Olympic Village"
+    }
+  },
+  {
+    "model": "staff.venue",
+    "pk": 16,
+    "fields": {
+      "code": "OVB",
+      "name": "Bormio Olympic Village"
+    }
+  },
+  {
+    "model": "staff.venue",
+    "pk": 17,
+    "fields": {
+      "code": "OVC",
+      "name": "Cortina Olympic Village"
+    }
+  },
+  {
+    "model": "staff.venue",
+    "pk": 18,
+    "fields": {
+      "code": "OVL",
+      "name": "Livigno Olympic Village"
+    }
+  },
+  {
+    "model": "staff.venue",
+    "pk": 19,
+    "fields": {
+      "code": "OVM",
+      "name": "Milano Olympic Village"
+    }
+  },
+  {
+    "model": "staff.venue",
+    "pk": 20,
+    "fields": {
+      "code": "OVP",
+      "name": "Predazzo Olympic Village"
+    }
+  },
+  {
+    "model": "staff.venue",
+    "pk": 21,
+    "fields": {
+      "code": "OFH",
+      "name": "Olympic Family Hotel"
+    }
+  },
+  {
+    "model": "staff.venue",
+    "pk": 22,
+    "fields": {
+      "code": "PFH",
+      "name": "Paralympic Family Hotel"
+    }
+  },
+  {
+    "model": "staff.venue",
+    "pk": 23,
+    "fields": {
+      "code": "MPC",
+      "name": "Main Press Centre"
+    }
+  },
+  {
+    "model": "staff.venue",
+    "pk": 24,
+    "fields": {
+      "code": "IBC",
+      "name": "International Broadcast Centre"
+    }
+  },
+  {
+    "model": "staff.venue",
+    "pk": 25,
+    "fields": {
+      "code": "PVC",
+      "name": "Cortina Paralympic Village"
+    }
+  },
+  {
+    "model": "staff.venue",
+    "pk": 26,
+    "fields": {
+      "code": "PVM",
+      "name": "Milano Paralympic Village"
+    }
+  },
+  {
+    "model": "staff.venue",
+    "pk": 27,
+    "fields": {
+      "code": "PVP",
+      "name": "Predazzo Paralympic Village"
+    }
+  },
+  {
+    "model": "staff.venue",
+    "pk": 28,
+    "fields": {
+      "code": "MOS",
+      "name": "Milano Olympic Stadium"
+    }
+  },
+  {
+    "model": "staff.venue",
+    "pk": 29,
+    "fields": {
+      "code": "VOA",
+      "name": "Verona Olympic Arena"
+    }
+  }
+]

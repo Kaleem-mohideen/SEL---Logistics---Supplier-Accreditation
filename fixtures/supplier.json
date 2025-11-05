@@ -1,0 +1,114 @@
+[
+  {
+    "model": "accounts.supplier",
+    "fields": {
+      "code": "SA02",
+      "name": "Sagit S.R.L.",
+      "function_code": 3
+    }
+  },
+  {
+    "model": "accounts.supplier",
+    "fields": {
+      "code": "SE03",
+      "name": "Sennder",
+      "function_code": 3
+    }
+  },
+  {
+    "model": "accounts.supplier",
+    "fields": {
+      "code": "TG04",
+      "name": "TGroup S.P.A.",
+      "function_code": 3
+    }
+  },
+  {
+    "model": "accounts.supplier",
+    "fields": {
+      "code": "PS01",
+      "name": "Professional Solutions",
+      "function_code": 1
+    }
+  },
+  {
+    "model": "accounts.supplier",
+    "fields": {
+      "code": "MT05",
+      "name": "Motorissima",
+      "function_code": 1
+    }
+  },
+  {
+    "model": "accounts.supplier",
+    "fields": {
+      "code": "GI07",
+      "name": "Giffi",
+      "function_code": 1
+    }
+  },
+  {
+    "model": "accounts.supplier",
+    "fields": {
+      "code": "EU08",
+      "name": "Europcar",
+      "function_code": 1
+    }
+  },
+  {
+    "model": "accounts.supplier",
+    "fields": {
+      "code": "DR09",
+      "name": "Drivalia",
+      "function_code": 1
+    }
+  },
+  {
+    "model": "accounts.supplier",
+    "fields": {
+      "code": "GI10",
+      "name": "Giollo",
+      "function_code": 1
+    }
+  },
+  {
+    "model": "accounts.supplier",
+    "fields": {
+      "code": "AN11",
+      "name": "Anterselva",
+      "function_code": 1
+    }
+  },
+  {
+    "model": "accounts.supplier",
+    "fields": {
+      "code": "PL12",
+      "name": "Plurima",
+      "function_code": 3
+    }
+  },
+  {
+    "model": "accounts.supplier",
+    "fields": {
+      "code": "SEL13",
+      "name": "SEL",
+      "function_code": 1
+    }
+  },
+  {
+    "model": "accounts.supplier",
+    "fields": {
+      "code": "PL14",
+      "name": "Plog",
+      "function_code": 1
+    }
+  },
+  {
+    "model": "accounts.supplier",
+    "fields": {
+      "code": "HZ06",
+      "name": "Hertz",
+      "function_code": 1
+    }
+  }
+]

@@ -1,0 +1,33 @@
+/* Dark Mode Variables */
+body.dark-mode {
+    background-color: #121212 !important;
+    color: #e3e3e3 !important;
+}
+
+/* Bootstrap override */
+body.dark-mode .card {
+    background-color: #1e1e1e !important;
+    color: #e3e3e3 !important;
+}
+
+body.dark-mode .navbar {
+    background-color: #1a1a1a !important;
+}
+
+body.dark-mode input,
+body.dark-mode select,
+body.dark-mode textarea {
+    background-color: #111 !important;
+    color: #fff !important;
+    border-color: #444 !important;
+}
+
+body.dark-mode .select2-container--default .select2-selection--multiple {
+    background-color: #111 !important;
+    border-color: #555 !important;
+    color: #fff !important;
+}
+
+body.dark-mode .badge {
+    filter: brightness(1.2);
+}

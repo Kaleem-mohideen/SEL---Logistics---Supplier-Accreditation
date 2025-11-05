@@ -1,0 +1,26 @@
+[
+  {
+    "model": "staff.gender",
+    "pk": 1,
+    "fields": {
+      "code": "F",
+      "label": "Female"
+    }
+  },
+  {
+    "model": "staff.gender",
+    "pk": 2,
+    "fields": {
+      "code": "M",
+      "label": "Male"
+    }
+  },
+  {
+    "model": "staff.gender",
+    "pk": 3,
+    "fields": {
+      "code": "X",
+      "label": "Other (only if stated in the identity document)"
+    }
+  }
+]

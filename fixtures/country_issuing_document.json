@@ -1,0 +1,1666 @@
+[
+  {
+    "model": "staff.countryissuingdocument",
+    "pk": 1,
+    "fields": {
+      "code": "ALB",
+      "country_name": "Albania"
+    }
+  },
+  {
+    "model": "staff.countryissuingdocument",
+    "pk": 2,
+    "fields": {
+      "code": "ALG",
+      "country_name": "Algeria"
+    }
+  },
+  {
+    "model": "staff.countryissuingdocument",
+    "pk": 3,
+    "fields": {
+      "code": "ASA",
+      "country_name": "American Samoa"
+    }
+  },
+  {
+    "model": "staff.countryissuingdocument",
+    "pk": 4,
+    "fields": {
+      "code": "AND",
+      "country_name": "Andorra"
+    }
+  },
+  {
+    "model": "staff.countryissuingdocument",
+    "pk": 5,
+    "fields": {
+      "code": "ANG",
+      "country_name": "Angola"
+    }
+  },
+  {
+    "model": "staff.countryissuingdocument",
+    "pk": 6,
+    "fields": {
+      "code": "ANT",
+      "country_name": "Antigua and Barbuda"
+    }
+  },
+  {
+    "model": "staff.countryissuingdocument",
+    "pk": 7,
+    "fields": {
+      "code": "ARG",
+      "country_name": "Argentina"
+    }
+  },
+  {
+    "model": "staff.countryissuingdocument",
+    "pk": 8,
+    "fields": {
+      "code": "ARM",
+      "country_name": "Armenia"
+    }
+  },
+  {
+    "model": "staff.countryissuingdocument",
+    "pk": 9,
+    "fields": {
+      "code": "ARU",
+      "country_name": "Aruba"
+    }
+  },
+  {
+    "model": "staff.countryissuingdocument",
+    "pk": 10,
+    "fields": {
+      "code": "AUS",
+      "country_name": "Australia"
+    }
+  },
+  {
+    "model": "staff.countryissuingdocument",
+    "pk": 11,
+    "fields": {
+      "code": "AUT",
+      "country_name": "Austria"
+    }
+  },
+  {
+    "model": "staff.countryissuingdocument",
+    "pk": 12,
+    "fields": {
+      "code": "AZE",
+      "country_name": "Azerbaijan"
+    }
+  },
+  {
+    "model": "staff.countryissuingdocument",
+    "pk": 13,
+    "fields": {
+      "code": "BAH",
+      "country_name": "Bahamas"
+    }
+  },
+  {
+    "model": "staff.countryissuingdocument",
+    "pk": 14,
+    "fields": {
+      "code": "BRN",
+      "country_name": "Bahrain"
+    }
+  },
+  {
+    "model": "staff.countryissuingdocument",
+    "pk": 15,
+    "fields": {
+      "code": "BAN",
+      "country_name": "Bangladesh"
+    }
+  },
+  {
+    "model": "staff.countryissuingdocument",
+    "pk": 16,
+    "fields": {
+      "code": "BAR",
+      "country_name": "Barbados"
+    }
+  },
+  {
+    "model": "staff.countryissuingdocument",
+    "pk": 17,
+    "fields": {
+      "code": "BLR",
+      "country_name": "Belarus"
+    }
+  },
+  {
+    "model": "staff.countryissuingdocument",
+    "pk": 18,
+    "fields": {
+      "code": "BEL",
+      "country_name": "Belgium"
+    }
+  },
+  {
+    "model": "staff.countryissuingdocument",
+    "pk": 19,
+    "fields": {
+      "code": "BIZ",
+      "country_name": "Belize"
+    }
+  },
+  {
+    "model": "staff.countryissuingdocument",
+    "pk": 20,
+    "fields": {
+      "code": "BEN",
+      "country_name": "Benin"
+    }
+  },
+  {
+    "model": "staff.countryissuingdocument",
+    "pk": 21,
+    "fields": {
+      "code": "BER",
+      "country_name": "Bermuda"
+    }
+  },
+  {
+    "model": "staff.countryissuingdocument",
+    "pk": 22,
+    "fields": {
+      "code": "BHU",
+      "country_name": "Bhutan"
+    }
+  },
+  {
+    "model": "staff.countryissuingdocument",
+    "pk": 23,
+    "fields": {
+      "code": "BOL",
+      "country_name": "Bolivia"
+    }
+  },
+  {
+    "model": "staff.countryissuingdocument",
+    "pk": 24,
+    "fields": {
+      "code": "BIH",
+      "country_name": "Bosnia and Herzegovina"
+    }
+  },
+  {
+    "model": "staff.countryissuingdocument",
+    "pk": 25,
+    "fields": {
+      "code": "BOT",
+      "country_name": "Botswana"
+    }
+  },
+  {
+    "model": "staff.countryissuingdocument",
+    "pk": 26,
+    "fields": {
+      "code": "BRA",
+      "country_name": "Brazil"
+    }
+  },
+  {
+    "model": "staff.countryissuingdocument",
+    "pk": 27,
+    "fields": {
+      "code": "BRU",
+      "country_name": "Brunei Darussalam"
+    }
+  },
+  {
+    "model": "staff.countryissuingdocument",
+    "pk": 28,
+    "fields": {
+      "code": "BUL",
+      "country_name": "Bulgaria"
+    }
+  },
+  {
+    "model": "staff.countryissuingdocument",
+    "pk": 29,
+    "fields": {
+      "code": "BUR",
+      "country_name": "Burkina Faso"
+    }
+  },
+  {
+    "model": "staff.countryissuingdocument",
+    "pk": 30,
+    "fields": {
+      "code": "BDI",
+      "country_name": "Burundi"
+    }
+  },
+  {
+    "model": "staff.countryissuingdocument",
+    "pk": 31,
+    "fields": {
+      "code": "CPV",
+      "country_name": "Cabo Verde"
+    }
+  },
+  {
+    "model": "staff.countryissuingdocument",
+    "pk": 32,
+    "fields": {
+      "code": "CAM",
+      "country_name": "Cambodia"
+    }
+  },
+  {
+    "model": "staff.countryissuingdocument",
+    "pk": 33,
+    "fields": {
+      "code": "CMR",
+      "country_name": "Cameroon"
+    }
+  },
+  {
+    "model": "staff.countryissuingdocument",
+    "pk": 34,
+    "fields": {
+      "code": "CAN",
+      "country_name": "Canada"
+    }
+  },
+  {
+    "model": "staff.countryissuingdocument",
+    "pk": 35,
+    "fields": {
+      "code": "CAY",
+      "country_name": "Cayman Islands"
+    }
+  },
+  {
+    "model": "staff.countryissuingdocument",
+    "pk": 36,
+    "fields": {
+      "code": "CAF",
+      "country_name": "Central African Republic"
+    }
+  },
+  {
+    "model": "staff.countryissuingdocument",
+    "pk": 37,
+    "fields": {
+      "code": "CHA",
+      "country_name": "Chad"
+    }
+  },
+  {
+    "model": "staff.countryissuingdocument",
+    "pk": 38,
+    "fields": {
+      "code": "CHI",
+      "country_name": "Chile"
+    }
+  },
+  {
+    "model": "staff.countryissuingdocument",
+    "pk": 39,
+    "fields": {
+      "code": "TPE",
+      "country_name": "Chinese Taipei"
+    }
+  },
+  {
+    "model": "staff.countryissuingdocument",
+    "pk": 40,
+    "fields": {
+      "code": "COL",
+      "country_name": "Colombia"
+    }
+  },
+  {
+    "model": "staff.countryissuingdocument",
+    "pk": 41,
+    "fields": {
+      "code": "COM",
+      "country_name": "Comoros"
+    }
+  },
+  {
+    "model": "staff.countryissuingdocument",
+    "pk": 42,
+    "fields": {
+      "code": "CGO",
+      "country_name": "Congo"
+    }
+  },
+  {
+    "model": "staff.countryissuingdocument",
+    "pk": 43,
+    "fields": {
+      "code": "COK",
+      "country_name": "Cook Islands"
+    }
+  },
+  {
+    "model": "staff.countryissuingdocument",
+    "pk": 44,
+    "fields": {
+      "code": "CRC",
+      "country_name": "Costa Rica"
+    }
+  },
+  {
+    "model": "staff.countryissuingdocument",
+    "pk": 45,
+    "fields": {
+      "code": "CIV",
+      "country_name": "Côte d'Ivoire"
+    }
+  },
+  {
+    "model": "staff.countryissuingdocument",
+    "pk": 46,
+    "fields": {
+      "code": "CRO",
+      "country_name": "Croatia"
+    }
+  },
+  {
+    "model": "staff.countryissuingdocument",
+    "pk": 47,
+    "fields": {
+      "code": "CUB",
+      "country_name": "Cuba"
+    }
+  },
+  {
+    "model": "staff.countryissuingdocument",
+    "pk": 48,
+    "fields": {
+      "code": "CYP",
+      "country_name": "Cyprus"
+    }
+  },
+  {
+    "model": "staff.countryissuingdocument",
+    "pk": 49,
+    "fields": {
+      "code": "CZE",
+      "country_name": "Czechia"
+    }
+  },
+  {
+    "model": "staff.countryissuingdocument",
+    "pk": 50,
+    "fields": {
+      "code": "PRK",
+      "country_name": "Democratic People’s Republic of Korea"
+    }
+  },
+  {
+    "model": "staff.countryissuingdocument",
+    "pk": 51,
+    "fields": {
+      "code": "COD",
+      "country_name": "Democratic Republic of the Congo"
+    }
+  },
+  {
+    "model": "staff.countryissuingdocument",
+    "pk": 52,
+    "fields": {
+      "code": "TLS",
+      "country_name": "Democratic Republic of Timor-Leste"
+    }
+  },
+  {
+    "model": "staff.countryissuingdocument",
+    "pk": 53,
+    "fields": {
+      "code": "DEN",
+      "country_name": "Denmark"
+    }
+  },
+  {
+    "model": "staff.countryissuingdocument",
+    "pk": 54,
+    "fields": {
+      "code": "DJI",
+      "country_name": "Djibouti"
+    }
+  },
+  {
+    "model": "staff.countryissuingdocument",
+    "pk": 55,
+    "fields": {
+      "code": "DMA",
+      "country_name": "Dominica"
+    }
+  },
+  {
+    "model": "staff.countryissuingdocument",
+    "pk": 56,
+    "fields": {
+      "code": "DOM",
+      "country_name": "Dominican Republic"
+    }
+  },
+  {
+    "model": "staff.countryissuingdocument",
+    "pk": 57,
+    "fields": {
+      "code": "ECU",
+      "country_name": "Ecuador"
+    }
+  },
+  {
+    "model": "staff.countryissuingdocument",
+    "pk": 58,
+    "fields": {
+      "code": "EGY",
+      "country_name": "Egypt"
+    }
+  },
+  {
+    "model": "staff.countryissuingdocument",
+    "pk": 59,
+    "fields": {
+      "code": "ESA",
+      "country_name": "El Salvador"
+    }
+  },
+  {
+    "model": "staff.countryissuingdocument",
+    "pk": 60,
+    "fields": {
+      "code": "GEQ",
+      "country_name": "Equatorial Guinea"
+    }
+  },
+  {
+    "model": "staff.countryissuingdocument",
+    "pk": 61,
+    "fields": {
+      "code": "ERI",
+      "country_name": "Eritrea"
+    }
+  },
+  {
+    "model": "staff.countryissuingdocument",
+    "pk": 62,
+    "fields": {
+      "code": "EST",
+      "country_name": "Estonia"
+    }
+  },
+  {
+    "model": "staff.countryissuingdocument",
+    "pk": 63,
+    "fields": {
+      "code": "SWZ",
+      "country_name": "Eswatini"
+    }
+  },
+  {
+    "model": "staff.countryissuingdocument",
+    "pk": 64,
+    "fields": {
+      "code": "ETH",
+      "country_name": "Ethiopia"
+    }
+  },
+  {
+    "model": "staff.countryissuingdocument",
+    "pk": 65,
+    "fields": {
+      "code": "FRO",
+      "country_name": "Faroe Islands"
+    }
+  },
+  {
+    "model": "staff.countryissuingdocument",
+    "pk": 66,
+    "fields": {
+      "code": "FSM",
+      "country_name": "Federated States of Micronesia"
+    }
+  },
+  {
+    "model": "staff.countryissuingdocument",
+    "pk": 67,
+    "fields": {
+      "code": "FIJ",
+      "country_name": "Fiji"
+    }
+  },
+  {
+    "model": "staff.countryissuingdocument",
+    "pk": 68,
+    "fields": {
+      "code": "FIN",
+      "country_name": "Finland"
+    }
+  },
+  {
+    "model": "staff.countryissuingdocument",
+    "pk": 69,
+    "fields": {
+      "code": "FRA",
+      "country_name": "France"
+    }
+  },
+  {
+    "model": "staff.countryissuingdocument",
+    "pk": 70,
+    "fields": {
+      "code": "GAB",
+      "country_name": "Gabon"
+    }
+  },
+  {
+    "model": "staff.countryissuingdocument",
+    "pk": 71,
+    "fields": {
+      "code": "GAM",
+      "country_name": "Gambia"
+    }
+  },
+  {
+    "model": "staff.countryissuingdocument",
+    "pk": 72,
+    "fields": {
+      "code": "GEO",
+      "country_name": "Georgia"
+    }
+  },
+  {
+    "model": "staff.countryissuingdocument",
+    "pk": 73,
+    "fields": {
+      "code": "GER",
+      "country_name": "Germany"
+    }
+  },
+  {
+    "model": "staff.countryissuingdocument",
+    "pk": 74,
+    "fields": {
+      "code": "GHA",
+      "country_name": "Ghana"
+    }
+  },
+  {
+    "model": "staff.countryissuingdocument",
+    "pk": 75,
+    "fields": {
+      "code": "GBR",
+      "country_name": "Great Britain"
+    }
+  },
+  {
+    "model": "staff.countryissuingdocument",
+    "pk": 76,
+    "fields": {
+      "code": "GRE",
+      "country_name": "Greece"
+    }
+  },
+  {
+    "model": "staff.countryissuingdocument",
+    "pk": 77,
+    "fields": {
+      "code": "GRN",
+      "country_name": "Grenada"
+    }
+  },
+  {
+    "model": "staff.countryissuingdocument",
+    "pk": 78,
+    "fields": {
+      "code": "GUM",
+      "country_name": "Guam"
+    }
+  },
+  {
+    "model": "staff.countryissuingdocument",
+    "pk": 79,
+    "fields": {
+      "code": "GUA",
+      "country_name": "Guatemala"
+    }
+  },
+  {
+    "model": "staff.countryissuingdocument",
+    "pk": 80,
+    "fields": {
+      "code": "GUI",
+      "country_name": "Guinea"
+    }
+  },
+  {
+    "model": "staff.countryissuingdocument",
+    "pk": 81,
+    "fields": {
+      "code": "GBS",
+      "country_name": "Guinea-Bissau"
+    }
+  },
+  {
+    "model": "staff.countryissuingdocument",
+    "pk": 82,
+    "fields": {
+      "code": "GUY",
+      "country_name": "Guyana"
+    }
+  },
+  {
+    "model": "staff.countryissuingdocument",
+    "pk": 83,
+    "fields": {
+      "code": "HAI",
+      "country_name": "Haiti"
+    }
+  },
+  {
+    "model": "staff.countryissuingdocument",
+    "pk": 84,
+    "fields": {
+      "code": "HON",
+      "country_name": "Honduras"
+    }
+  },
+  {
+    "model": "staff.countryissuingdocument",
+    "pk": 85,
+    "fields": {
+      "code": "HKG",
+      "country_name": "Hong Kong, China"
+    }
+  },
+  {
+    "model": "staff.countryissuingdocument",
+    "pk": 86,
+    "fields": {
+      "code": "HUN",
+      "country_name": "Hungary"
+    }
+  },
+  {
+    "model": "staff.countryissuingdocument",
+    "pk": 87,
+    "fields": {
+      "code": "ISL",
+      "country_name": "Iceland"
+    }
+  },
+  {
+    "model": "staff.countryissuingdocument",
+    "pk": 88,
+    "fields": {
+      "code": "IND",
+      "country_name": "India"
+    }
+  },
+  {
+    "model": "staff.countryissuingdocument",
+    "pk": 89,
+    "fields": {
+      "code": "INA",
+      "country_name": "Indonesia"
+    }
+  },
+  {
+    "model": "staff.countryissuingdocument",
+    "pk": 90,
+    "fields": {
+      "code": "IRQ",
+      "country_name": "Iraq"
+    }
+  },
+  {
+    "model": "staff.countryissuingdocument",
+    "pk": 91,
+    "fields": {
+      "code": "IRL",
+      "country_name": "Ireland"
+    }
+  },
+  {
+    "model": "staff.countryissuingdocument",
+    "pk": 92,
+    "fields": {
+      "code": "IRI",
+      "country_name": "Islamic Republic of Iran"
+    }
+  },
+  {
+    "model": "staff.countryissuingdocument",
+    "pk": 93,
+    "fields": {
+      "code": "ISR",
+      "country_name": "Israel"
+    }
+  },
+  {
+    "model": "staff.countryissuingdocument",
+    "pk": 94,
+    "fields": {
+      "code": "ITA",
+      "country_name": "Italy"
+    }
+  },
+  {
+    "model": "staff.countryissuingdocument",
+    "pk": 95,
+    "fields": {
+      "code": "JAM",
+      "country_name": "Jamaica"
+    }
+  },
+  {
+    "model": "staff.countryissuingdocument",
+    "pk": 96,
+    "fields": {
+      "code": "JPN",
+      "country_name": "Japan"
+    }
+  },
+  {
+    "model": "staff.countryissuingdocument",
+    "pk": 97,
+    "fields": {
+      "code": "JOR",
+      "country_name": "Jordan"
+    }
+  },
+  {
+    "model": "staff.countryissuingdocument",
+    "pk": 98,
+    "fields": {
+      "code": "KAZ",
+      "country_name": "Kazakhstan"
+    }
+  },
+  {
+    "model": "staff.countryissuingdocument",
+    "pk": 99,
+    "fields": {
+      "code": "KEN",
+      "country_name": "Kenya"
+    }
+  },
+  {
+    "model": "staff.countryissuingdocument",
+    "pk": 100,
+    "fields": {
+      "code": "KIR",
+      "country_name": "Kiribati"
+    }
+  },
+  {
+    "model": "staff.countryissuingdocument",
+    "pk": 101,
+    "fields": {
+      "code": "KOS",
+      "country_name": "Kosovo"
+    }
+  },
+  {
+    "model": "staff.countryissuingdocument",
+    "pk": 102,
+    "fields": {
+      "code": "KUW",
+      "country_name": "Kuwait"
+    }
+  },
+  {
+    "model": "staff.countryissuingdocument",
+    "pk": 103,
+    "fields": {
+      "code": "KGZ",
+      "country_name": "Kyrgyzstan"
+    }
+  },
+  {
+    "model": "staff.countryissuingdocument",
+    "pk": 104,
+    "fields": {
+      "code": "LAO",
+      "country_name": "Lao People’s Democratic Republic"
+    }
+  },
+  {
+    "model": "staff.countryissuingdocument",
+    "pk": 105,
+    "fields": {
+      "code": "LAT",
+      "country_name": "Latvia"
+    }
+  },
+  {
+    "model": "staff.countryissuingdocument",
+    "pk": 106,
+    "fields": {
+      "code": "LBN",
+      "country_name": "Lebanon"
+    }
+  },
+  {
+    "model": "staff.countryissuingdocument",
+    "pk": 107,
+    "fields": {
+      "code": "LES",
+      "country_name": "Lesotho"
+    }
+  },
+  {
+    "model": "staff.countryissuingdocument",
+    "pk": 108,
+    "fields": {
+      "code": "LBR",
+      "country_name": "Liberia"
+    }
+  },
+  {
+    "model": "staff.countryissuingdocument",
+    "pk": 109,
+    "fields": {
+      "code": "LBA",
+      "country_name": "Libya"
+    }
+  },
+  {
+    "model": "staff.countryissuingdocument",
+    "pk": 110,
+    "fields": {
+      "code": "LIE",
+      "country_name": "Liechtenstein"
+    }
+  },
+  {
+    "model": "staff.countryissuingdocument",
+    "pk": 111,
+    "fields": {
+      "code": "LTU",
+      "country_name": "Lithuania"
+    }
+  },
+  {
+    "model": "staff.countryissuingdocument",
+    "pk": 112,
+    "fields": {
+      "code": "LUX",
+      "country_name": "Luxembourg"
+    }
+  },
+  {
+    "model": "staff.countryissuingdocument",
+    "pk": 113,
+    "fields": {
+      "code": "MAC",
+      "country_name": "Macao, China"
+    }
+  },
+  {
+    "model": "staff.countryissuingdocument",
+    "pk": 114,
+    "fields": {
+      "code": "MAD",
+      "country_name": "Madagascar"
+    }
+  },
+  {
+    "model": "staff.countryissuingdocument",
+    "pk": 115,
+    "fields": {
+      "code": "MAW",
+      "country_name": "Malawi"
+    }
+  },
+  {
+    "model": "staff.countryissuingdocument",
+    "pk": 116,
+    "fields": {
+      "code": "MAS",
+      "country_name": "Malaysia"
+    }
+  },
+  {
+    "model": "staff.countryissuingdocument",
+    "pk": 117,
+    "fields": {
+      "code": "MDV",
+      "country_name": "Maldives"
+    }
+  },
+  {
+    "model": "staff.countryissuingdocument",
+    "pk": 118,
+    "fields": {
+      "code": "MLI",
+      "country_name": "Mali"
+    }
+  },
+  {
+    "model": "staff.countryissuingdocument",
+    "pk": 119,
+    "fields": {
+      "code": "MLT",
+      "country_name": "Malta"
+    }
+  },
+  {
+    "model": "staff.countryissuingdocument",
+    "pk": 120,
+    "fields": {
+      "code": "MHL",
+      "country_name": "Marshall Islands"
+    }
+  },
+  {
+    "model": "staff.countryissuingdocument",
+    "pk": 121,
+    "fields": {
+      "code": "MTN",
+      "country_name": "Mauritania"
+    }
+  },
+  {
+    "model": "staff.countryissuingdocument",
+    "pk": 122,
+    "fields": {
+      "code": "MRI",
+      "country_name": "Mauritius"
+    }
+  },
+  {
+    "model": "staff.countryissuingdocument",
+    "pk": 123,
+    "fields": {
+      "code": "MEX",
+      "country_name": "Mexico"
+    }
+  },
+  {
+    "model": "staff.countryissuingdocument",
+    "pk": 124,
+    "fields": {
+      "code": "MON",
+      "country_name": "Monaco"
+    }
+  },
+  {
+    "model": "staff.countryissuingdocument",
+    "pk": 125,
+    "fields": {
+      "code": "MGL",
+      "country_name": "Mongolia"
+    }
+  },
+  {
+    "model": "staff.countryissuingdocument",
+    "pk": 126,
+    "fields": {
+      "code": "MNE",
+      "country_name": "Montenegro"
+    }
+  },
+  {
+    "model": "staff.countryissuingdocument",
+    "pk": 127,
+    "fields": {
+      "code": "MAR",
+      "country_name": "Morocco"
+    }
+  },
+  {
+    "model": "staff.countryissuingdocument",
+    "pk": 128,
+    "fields": {
+      "code": "MOZ",
+      "country_name": "Mozambique"
+    }
+  },
+  {
+    "model": "staff.countryissuingdocument",
+    "pk": 129,
+    "fields": {
+      "code": "MYA",
+      "country_name": "Myanmar"
+    }
+  },
+  {
+    "model": "staff.countryissuingdocument",
+    "pk": 130,
+    "fields": {
+      "code": "NAM",
+      "country_name": "Namibia"
+    }
+  },
+  {
+    "model": "staff.countryissuingdocument",
+    "pk": 131,
+    "fields": {
+      "code": "NRU",
+      "country_name": "Nauru"
+    }
+  },
+  {
+    "model": "staff.countryissuingdocument",
+    "pk": 132,
+    "fields": {
+      "code": "NEP",
+      "country_name": "Nepal"
+    }
+  },
+  {
+    "model": "staff.countryissuingdocument",
+    "pk": 133,
+    "fields": {
+      "code": "NED",
+      "country_name": "Netherlands"
+    }
+  },
+  {
+    "model": "staff.countryissuingdocument",
+    "pk": 134,
+    "fields": {
+      "code": "NZL",
+      "country_name": "New Zealand"
+    }
+  },
+  {
+    "model": "staff.countryissuingdocument",
+    "pk": 135,
+    "fields": {
+      "code": "NCA",
+      "country_name": "Nicaragua"
+    }
+  },
+  {
+    "model": "staff.countryissuingdocument",
+    "pk": 136,
+    "fields": {
+      "code": "NIG",
+      "country_name": "Niger"
+    }
+  },
+  {
+    "model": "staff.countryissuingdocument",
+    "pk": 137,
+    "fields": {
+      "code": "NGR",
+      "country_name": "Nigeria"
+    }
+  },
+  {
+    "model": "staff.countryissuingdocument",
+    "pk": 138,
+    "fields": {
+      "code": "MKD",
+      "country_name": "North Macedonia"
+    }
+  },
+  {
+    "model": "staff.countryissuingdocument",
+    "pk": 139,
+    "fields": {
+      "code": "NOR",
+      "country_name": "Norway"
+    }
+  },
+  {
+    "model": "staff.countryissuingdocument",
+    "pk": 140,
+    "fields": {
+      "code": "OMA",
+      "country_name": "Oman"
+    }
+  },
+  {
+    "model": "staff.countryissuingdocument",
+    "pk": 141,
+    "fields": {
+      "code": "PAK",
+      "country_name": "Pakistan"
+    }
+  },
+  {
+    "model": "staff.countryissuingdocument",
+    "pk": 142,
+    "fields": {
+      "code": "PLW",
+      "country_name": "Palau"
+    }
+  },
+  {
+    "model": "staff.countryissuingdocument",
+    "pk": 143,
+    "fields": {
+      "code": "PLE",
+      "country_name": "Palestine"
+    }
+  },
+  {
+    "model": "staff.countryissuingdocument",
+    "pk": 144,
+    "fields": {
+      "code": "PAN",
+      "country_name": "Panama"
+    }
+  },
+  {
+    "model": "staff.countryissuingdocument",
+    "pk": 145,
+    "fields": {
+      "code": "PNG",
+      "country_name": "Papua New Guinea"
+    }
+  },
+  {
+    "model": "staff.countryissuingdocument",
+    "pk": 146,
+    "fields": {
+      "code": "PAR",
+      "country_name": "Paraguay"
+    }
+  },
+  {
+    "model": "staff.countryissuingdocument",
+    "pk": 147,
+    "fields": {
+      "code": "CHN",
+      "country_name": "People’s Republic of China"
+    }
+  },
+  {
+    "model": "staff.countryissuingdocument",
+    "pk": 148,
+    "fields": {
+      "code": "PER",
+      "country_name": "Peru"
+    }
+  },
+  {
+    "model": "staff.countryissuingdocument",
+    "pk": 149,
+    "fields": {
+      "code": "PHI",
+      "country_name": "Philippines"
+    }
+  },
+  {
+    "model": "staff.countryissuingdocument",
+    "pk": 150,
+    "fields": {
+      "code": "POL",
+      "country_name": "Poland"
+    }
+  },
+  {
+    "model": "staff.countryissuingdocument",
+    "pk": 151,
+    "fields": {
+      "code": "POR",
+      "country_name": "Portugal"
+    }
+  },
+  {
+    "model": "staff.countryissuingdocument",
+    "pk": 152,
+    "fields": {
+      "code": "PUR",
+      "country_name": "Puerto Rico"
+    }
+  },
+  {
+    "model": "staff.countryissuingdocument",
+    "pk": 153,
+    "fields": {
+      "code": "QAT",
+      "country_name": "Qatar"
+    }
+  },
+  {
+    "model": "staff.countryissuingdocument",
+    "pk": 154,
+    "fields": {
+      "code": "KOR",
+      "country_name": "Republic of Korea"
+    }
+  },
+  {
+    "model": "staff.countryissuingdocument",
+    "pk": 155,
+    "fields": {
+      "code": "MDA",
+      "country_name": "Republic of Moldova"
+    }
+  },
+  {
+    "model": "staff.countryissuingdocument",
+    "pk": 156,
+    "fields": {
+      "code": "ROU",
+      "country_name": "Romania"
+    }
+  },
+  {
+    "model": "staff.countryissuingdocument",
+    "pk": 157,
+    "fields": {
+      "code": "RUS",
+      "country_name": "Russian Federation"
+    }
+  },
+  {
+    "model": "staff.countryissuingdocument",
+    "pk": 158,
+    "fields": {
+      "code": "RWA",
+      "country_name": "Rwanda"
+    }
+  },
+  {
+    "model": "staff.countryissuingdocument",
+    "pk": 159,
+    "fields": {
+      "code": "SKN",
+      "country_name": "Saint Kitts and Nevis"
+    }
+  },
+  {
+    "model": "staff.countryissuingdocument",
+    "pk": 160,
+    "fields": {
+      "code": "LCA",
+      "country_name": "Saint Lucia"
+    }
+  },
+  {
+    "model": "staff.countryissuingdocument",
+    "pk": 161,
+    "fields": {
+      "code": "SAM",
+      "country_name": "Samoa"
+    }
+  },
+  {
+    "model": "staff.countryissuingdocument",
+    "pk": 162,
+    "fields": {
+      "code": "SMR",
+      "country_name": "San Marino"
+    }
+  },
+  {
+    "model": "staff.countryissuingdocument",
+    "pk": 163,
+    "fields": {
+      "code": "STP",
+      "country_name": "Sao Tome & Principe"
+    }
+  },
+  {
+    "model": "staff.countryissuingdocument",
+    "pk": 164,
+    "fields": {
+      "code": "KSA",
+      "country_name": "Saudi Arabia"
+    }
+  },
+  {
+    "model": "staff.countryissuingdocument",
+    "pk": 165,
+    "fields": {
+      "code": "SEN",
+      "country_name": "Senegal"
+    }
+  },
+  {
+    "model": "staff.countryissuingdocument",
+    "pk": 166,
+    "fields": {
+      "code": "SRB",
+      "country_name": "Serbia"
+    }
+  },
+  {
+    "model": "staff.countryissuingdocument",
+    "pk": 167,
+    "fields": {
+      "code": "SEY",
+      "country_name": "Seychelles"
+    }
+  },
+  {
+    "model": "staff.countryissuingdocument",
+    "pk": 168,
+    "fields": {
+      "code": "SLE",
+      "country_name": "Sierra Leone"
+    }
+  },
+  {
+    "model": "staff.countryissuingdocument",
+    "pk": 169,
+    "fields": {
+      "code": "SGP",
+      "country_name": "Singapore"
+    }
+  },
+  {
+    "model": "staff.countryissuingdocument",
+    "pk": 170,
+    "fields": {
+      "code": "SVK",
+      "country_name": "Slovakia"
+    }
+  },
+  {
+    "model": "staff.countryissuingdocument",
+    "pk": 171,
+    "fields": {
+      "code": "SLO",
+      "country_name": "Slovenia"
+    }
+  },
+  {
+    "model": "staff.countryissuingdocument",
+    "pk": 172,
+    "fields": {
+      "code": "SOL",
+      "country_name": "Solomon Islands"
+    }
+  },
+  {
+    "model": "staff.countryissuingdocument",
+    "pk": 173,
+    "fields": {
+      "code": "SOM",
+      "country_name": "Somalia"
+    }
+  },
+  {
+    "model": "staff.countryissuingdocument",
+    "pk": 174,
+    "fields": {
+      "code": "RSA",
+      "country_name": "South Africa"
+    }
+  },
+  {
+    "model": "staff.countryissuingdocument",
+    "pk": 175,
+    "fields": {
+      "code": "SSD",
+      "country_name": "South Sudan"
+    }
+  },
+  {
+    "model": "staff.countryissuingdocument",
+    "pk": 176,
+    "fields": {
+      "code": "ESP",
+      "country_name": "Spain"
+    }
+  },
+  {
+    "model": "staff.countryissuingdocument",
+    "pk": 177,
+    "fields": {
+      "code": "SRI",
+      "country_name": "Sri Lanka"
+    }
+  },
+  {
+    "model": "staff.countryissuingdocument",
+    "pk": 178,
+    "fields": {
+      "code": "VIN",
+      "country_name": "St Vincent and the Grenadines"
+    }
+  },
+  {
+    "model": "staff.countryissuingdocument",
+    "pk": 179,
+    "fields": {
+      "code": "SUD",
+      "country_name": "Sudan"
+    }
+  },
+  {
+    "model": "staff.countryissuingdocument",
+    "pk": 180,
+    "fields": {
+      "code": "SUR",
+      "country_name": "Suriname"
+    }
+  },
+  {
+    "model": "staff.countryissuingdocument",
+    "pk": 181,
+    "fields": {
+      "code": "SWE",
+      "country_name": "Sweden"
+    }
+  },
+  {
+    "model": "staff.countryissuingdocument",
+    "pk": 182,
+    "fields": {
+      "code": "SUI",
+      "country_name": "Switzerland"
+    }
+  },
+  {
+    "model": "staff.countryissuingdocument",
+    "pk": 183,
+    "fields": {
+      "code": "SYR",
+      "country_name": "Syrian Arab Republic"
+    }
+  },
+  {
+    "model": "staff.countryissuingdocument",
+    "pk": 184,
+    "fields": {
+      "code": "TJK",
+      "country_name": "Tajikistan"
+    }
+  },
+  {
+    "model": "staff.countryissuingdocument",
+    "pk": 185,
+    "fields": {
+      "code": "THA",
+      "country_name": "Thailand"
+    }
+  },
+  {
+    "model": "staff.countryissuingdocument",
+    "pk": 186,
+    "fields": {
+      "code": "TOG",
+      "country_name": "Togo"
+    }
+  },
+  {
+    "model": "staff.countryissuingdocument",
+    "pk": 187,
+    "fields": {
+      "code": "TGA",
+      "country_name": "Tonga"
+    }
+  },
+  {
+    "model": "staff.countryissuingdocument",
+    "pk": 188,
+    "fields": {
+      "code": "TTO",
+      "country_name": "Trinidad and Tobago"
+    }
+  },
+  {
+    "model": "staff.countryissuingdocument",
+    "pk": 189,
+    "fields": {
+      "code": "TUN",
+      "country_name": "Tunisia"
+    }
+  },
+  {
+    "model": "staff.countryissuingdocument",
+    "pk": 190,
+    "fields": {
+      "code": "TUR",
+      "country_name": "Türkiye"
+    }
+  },
+  {
+    "model": "staff.countryissuingdocument",
+    "pk": 191,
+    "fields": {
+      "code": "TKM",
+      "country_name": "Turkmenistan"
+    }
+  },
+  {
+    "model": "staff.countryissuingdocument",
+    "pk": 192,
+    "fields": {
+      "code": "TUV",
+      "country_name": "Tuvalu"
+    }
+  },
+  {
+    "model": "staff.countryissuingdocument",
+    "pk": 193,
+    "fields": {
+      "code": "UGA",
+      "country_name": "Uganda"
+    }
+  },
+  {
+    "model": "staff.countryissuingdocument",
+    "pk": 194,
+    "fields": {
+      "code": "UKR",
+      "country_name": "Ukraine"
+    }
+  },
+  {
+    "model": "staff.countryissuingdocument",
+    "pk": 195,
+    "fields": {
+      "code": "UAE",
+      "country_name": "United Arab Emirates"
+    }
+  },
+  {
+    "model": "staff.countryissuingdocument",
+    "pk": 196,
+    "fields": {
+      "code": "TAN",
+      "country_name": "United Republic of Tanzania"
+    }
+  },
+  {
+    "model": "staff.countryissuingdocument",
+    "pk": 197,
+    "fields": {
+      "code": "USA",
+      "country_name": "United States of America"
+    }
+  },
+  {
+    "model": "staff.countryissuingdocument",
+    "pk": 198,
+    "fields": {
+      "code": "URU",
+      "country_name": "Uruguay"
+    }
+  },
+  {
+    "model": "staff.countryissuingdocument",
+    "pk": 199,
+    "fields": {
+      "code": "UZB",
+      "country_name": "Uzbekistan"
+    }
+  },
+  {
+    "model": "staff.countryissuingdocument",
+    "pk": 200,
+    "fields": {
+      "code": "VAN",
+      "country_name": "Vanuatu"
+    }
+  },
+  {
+    "model": "staff.countryissuingdocument",
+    "pk": 201,
+    "fields": {
+      "code": "VAT",
+      "country_name": "Vatican"
+    }
+  },
+  {
+    "model": "staff.countryissuingdocument",
+    "pk": 202,
+    "fields": {
+      "code": "VEN",
+      "country_name": "Venezuela"
+    }
+  },
+  {
+    "model": "staff.countryissuingdocument",
+    "pk": 203,
+    "fields": {
+      "code": "VIE",
+      "country_name": "Vietnam"
+    }
+  },
+  {
+    "model": "staff.countryissuingdocument",
+    "pk": 204,
+    "fields": {
+      "code": "IVB",
+      "country_name": "Virgin Islands, British"
+    }
+  },
+  {
+    "model": "staff.countryissuingdocument",
+    "pk": 205,
+    "fields": {
+      "code": "ISV",
+      "country_name": "Virgin Islands, US"
+    }
+  },
+  {
+    "model": "staff.countryissuingdocument",
+    "pk": 206,
+    "fields": {
+      "code": "YEM",
+      "country_name": "Yemen"
+    }
+  },
+  {
+    "model": "staff.countryissuingdocument",
+    "pk": 207,
+    "fields": {
+      "code": "ZAM",
+      "country_name": "Zambia"
+    }
+  },
+  {
+    "model": "staff.countryissuingdocument",
+    "pk": 208,
+    "fields": {
+      "code": "ZIM",
+      "country_name": "Zimbabwe"
+    }
+  }
+]

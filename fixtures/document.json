@@ -1,0 +1,16 @@
+[
+  {
+    "model": "staff.document",
+    "pk": 1,
+    "fields": {
+      "type_name": "Identity Card (European Union countries – Schengen Area – other accepted identity cards)"
+    }
+  },
+  {
+    "model": "staff.document",
+    "pk": 2,
+    "fields": {
+      "type_name": "Passport"
+    }
+  }
+]

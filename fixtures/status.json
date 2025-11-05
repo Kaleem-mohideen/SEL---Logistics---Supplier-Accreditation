@@ -1,0 +1,18 @@
+[
+  {
+    "model": "staff.status",
+    "pk": 1,
+    "fields": {
+      "status_id": "0",
+      "label": "Non Completo"
+    }
+  },
+  {
+    "model": "staff.status",
+    "pk": 2,
+    "fields": {
+      "status_id": "1",
+      "label": "Completato"
+    }
+  }
+]

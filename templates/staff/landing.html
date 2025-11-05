@@ -1,0 +1,88 @@
+{% extends "base.html" %}
+{% block title %}Supplier Portal - Staff{% endblock %}
+
+{% block content %}
+<div class="container mt-4">
+  <div class="d-flex justify-content-between align-items-center mb-3">
+    <h3>Staff Registration</h3>
+    <a class="btn btn-success" href="{% url 'staff:create' %}">+ Add New Staff</a>
+    <a href="{% url 'staff:export' %}" class="btn btn-success">
+    ⬇ Export to Excel
+    </a>
+
+  </div>
+
+  {% if staff_list %}
+  <div class="table-responsive">
+    <table class="table table-hover align-middle">
+      <thead class="table-light">
+        <tr>
+          <th>PLOG Unique ID</th>
+          <th>Worker Unique ID</th>
+          <th>Name</th>
+          <th>Date of Birth</th>
+          <th>Venues</th>
+          <th>Status</th>
+          <th>Created</th>
+          <th></th>
+        </tr>
+      </thead>
+      <tbody>
+        {% for s in staff_list %}
+        <tr>
+          <td>{{ s.plog_unique_id }}</td>
+          <td>{{ s.worker_unique_id }}</td>
+          <td>{{ s.document_family_name }} {{ s.document_given_name }}</td>
+          <td>{{ s.date_of_birth }}</td>
+          <td>
+            {% for v in s.venue.all %}
+              <span class="badge bg-secondary">{{ v.name }}</span>
+            {% empty %}
+              <span class="text-muted">—</span>
+            {% endfor %}
+          </td>
+          <td>
+            {% if s.status %}
+              <span class="badge
+                {% if s.status.status_id == '0' %} bg-warning text-dark
+                {% elif s.status.status_id == '1' %} bg-success
+                {% elif s.status.status_id == '2' %} bg-info text-dark
+                {% else %} bg-secondary {% endif %}">
+                {{ s.status.label }}
+              </span>
+            {% endif %}
+          </td>
+          <td>{{ s.created_at|date:"Y-m-d H:i" }}</td>
+          <td>
+            {% if s.status and s.status.status_id != '1' %}
+              <a class="btn btn-sm btn-outline-primary" href="{% url 'staff:edit' s.pk %}">Edit</a>
+            {% else %}
+              <button class="btn btn-sm btn-outline-secondary" disabled>Locked</button>
+            {% endif %}
+          </td>
+        </tr>
+        {% endfor %}
+      </tbody>
+    </table>
+  </div>
+
+  {% else %}
+    <div class="alert alert-info">No staff records yet. Click "Add New Staff" to register.</div>
+  {% endif %}
+
+  <!-- pagination -->
+  {% if is_paginated %}
+  <nav>
+    <ul class="pagination">
+      {% if page_obj.has_previous %}
+        <li class="page-item"><a class="page-link" href="?page={{ page_obj.previous_page_number }}">Previous</a></li>
+      {% endif %}
+      <li class="page-item active"><span class="page-link">{{ page_obj.number }}</span></li>
+      {% if page_obj.has_next %}
+        <li class="page-item"><a class="page-link" href="?page={{ page_obj.next_page_number }}">Next</a></li>
+      {% endif %}
+    </ul>
+  </nav>
+  {% endif %}
+</div>
+{% endblock %}

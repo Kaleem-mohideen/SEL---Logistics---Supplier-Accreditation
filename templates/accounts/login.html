@@ -1,0 +1,22 @@
+{% extends "base.html" %}
+{% block content %}
+<div class="container mt-5" style="max-width:400px;">
+  <h3 class="mb-3 text-center">Supplier Portal Login</h3>
+  <form method="post" novalidate>
+    {% csrf_token %}
+    {{ form.non_field_errors }}
+    <div class="mb-3">
+      <label>User ID (SupplierCode + UserCode)</label>
+      {{ form.username }}
+    </div>
+    <div class="mb-3 position-relative">
+      <label>Password</label>
+      {{ form.password }}
+      <button type="button" class="btn btn-outline-secondary toggle-password" data-target="id_password">
+        <i class="bi bi-eye"></i>
+      </button>
+    </div>
+    <button type="submit" class="btn btn-primary w-100">Login</button>
+  </form>
+</div>
+{% endblock %}

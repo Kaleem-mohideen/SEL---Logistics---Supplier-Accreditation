@@ -1,0 +1,14 @@
+/* Blue Export button matching admin style */
+a.export-btn {
+    background-color: #0d6efd !important;
+    border-color: #0d6efd !important;
+    color: white !important;
+    font-weight: 600;
+    border-radius: 4px;
+    padding: 6px 12px;
+}
+
+a.export-btn:hover {
+    background-color: #0b5ed7 !important;
+    border-color: #0a58ca !important;
+}
