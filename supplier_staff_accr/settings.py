@@ -112,11 +112,11 @@ WSGI_APPLICATION = 'supplier_staff_accr.wsgi.application'
 DATABASES = {
     'default': {
         'ENGINE': 'django.db.backends.postgresql',
-        'NAME': 'reg2026db',  # from DigitalOcean
-        'USER': 'reg2026admin',
-        'PASSWORD': 'AVNS_KCEzAhnk4ru6hCu-god',  # from DigitalOcean
-        'HOST': 'dbaas-db-10769790-do-user-8282915-0.m.db.ondigitalocean.com',
-        'PORT': '25060',
+        'NAME': os.getenv('DB_NAME'),  # from DigitalOcean
+        'USER': os.getenv('DB_USER'),
+        'PASSWORD': os.getenv('DB_PASSWORD'),  # from DigitalOcean
+        'HOST': os.getenv('DB_HOST', 'localhost'),
+        'PORT': os.getenv('DB_PORT', '5432'),
         'OPTIONS': {
             'sslmode': 'require',
         },
