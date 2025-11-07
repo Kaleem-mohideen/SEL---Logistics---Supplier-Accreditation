@@ -9,10 +9,6 @@ load_dotenv()
 def main():
     """Run administrative tasks."""
     # convert_to_utf8.py
-    with open("data.json", "r", encoding="latin-1") as f:
-        data = f.read()
-    with open("data_utf8.json", "w", encoding="utf-8") as f:
-        f.write(data)
     os.environ.setdefault('DJANGO_SETTINGS_MODULE', 'supplier_staff_accr.settings')
     try:
         from django.core.management import execute_from_command_line
