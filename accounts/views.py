@@ -18,5 +18,14 @@ class SupplierLoginView(LoginView):
             return reverse_lazy('admin:index')
         return reverse_lazy("staff:landing")
 
+    def form_valid(self, form):
+        print("✅ LOGIN SUCCESS:", self.request.user)
+        return super().form_valid(form)
+
+    def form_invalid(self, form):
+        print("❌ LOGIN FAILED")
+        return super().form_invalid(form)
+
+
 class SupplierLogoutView(LogoutView):
     next_page = reverse_lazy('accounts:login')
