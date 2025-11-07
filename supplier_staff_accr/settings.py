@@ -98,16 +98,31 @@ WSGI_APPLICATION = 'supplier_staff_accr.wsgi.application'
 #     'default': dj_database_url.config(default=os.getenv('DATABASE_URL'))
 # }
 
+# DATABASES = {
+#     'default': {
+#         'ENGINE': 'django.db.backends.postgresql',
+#         'NAME': os.getenv('DB_NAME'),                 # your database name
+#         'USER': os.getenv('DB_USER'),                 # your database user
+#         'PASSWORD': os.getenv('DB_PASSWORD'),         # password for supplier_user
+#         'HOST': os.getenv('DB_HOST', 'localhost'),    # same machine
+#         'PORT': os.getenv('DB_PORT', '5432'),         # default postgres port
+#     }
+# }
+
 DATABASES = {
     'default': {
         'ENGINE': 'django.db.backends.postgresql',
-        'NAME': os.getenv('DB_NAME'),                 # your database name
-        'USER': os.getenv('DB_USER'),                 # your database user
-        'PASSWORD': os.getenv('DB_PASSWORD'),         # password for supplier_user
-        'HOST': os.getenv('DB_HOST', 'localhost'),    # same machine
-        'PORT': os.getenv('DB_PORT', '5432'),         # default postgres port
+        'NAME': 'reg2026db',  # from DigitalOcean
+        'USER': 'reg2026admin',
+        'PASSWORD': 'AVNS_KCEzAhnk4ru6hCu-god',  # from DigitalOcean
+        'HOST': 'dbaas-db-10769790-do-user-8282915-0.m.db.ondigitalocean.com',
+        'PORT': '25060',
+        'OPTIONS': {
+            'sslmode': 'require',
+        },
     }
 }
+
 
 # Password validation
 # https://docs.djangoproject.com/en/4.2/ref/settings/#auth-password-validators
