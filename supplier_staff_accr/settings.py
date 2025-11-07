@@ -98,6 +98,7 @@ WSGI_APPLICATION = 'supplier_staff_accr.wsgi.application'
 #     'default': dj_database_url.config(default=os.getenv('DATABASE_URL'))
 # }
 
+#dev
 # DATABASES = {
 #     'default': {
 #         'ENGINE': 'django.db.backends.postgresql',
@@ -109,6 +110,7 @@ WSGI_APPLICATION = 'supplier_staff_accr.wsgi.application'
 #     }
 # }
 
+# admin_change
 DATABASES = {
     'default': {
         'ENGINE': 'django.db.backends.postgresql',
@@ -161,6 +163,7 @@ USE_TZ = True
 # https://docs.djangoproject.com/en/4.2/howto/static-files/
 
 STATIC_URL = '/static/'
+#dev
 # STATICFILES_DIRS = [
 #     BASE_DIR / "static",
 # ]
@@ -168,6 +171,8 @@ STATIC_URL = '/static/'
 
 # Optional: where Django should look for additional app-level static files
 # (only needed if you have custom static files outside apps)
+
+# admin_change
 STATICFILES_DIRS = []
 STATIC_ROOT = '/webappsDjango/reg2026/SEL---Logistics---Supplier-Accreditation/static/' #prod
 
