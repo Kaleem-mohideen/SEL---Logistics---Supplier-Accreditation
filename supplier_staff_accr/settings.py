@@ -145,11 +145,14 @@ USE_TZ = True
 # https://docs.djangoproject.com/en/4.2/howto/static-files/
 
 STATIC_URL = '/static/'
-STATICFILES_DIRS = [
-    BASE_DIR / "static",
-]
+# STATICFILES_DIRS = [
+#     BASE_DIR / "static",
+# ]
 # STATIC_ROOT = BASE_DIR / "staticfiles" #dev
 
+# Optional: where Django should look for additional app-level static files
+# (only needed if you have custom static files outside apps)
+STATICFILES_DIRS = []
 STATIC_ROOT = '/webappsDjango/reg2026/SEL---Logistics---Supplier-Accreditation/static/' #prod
 
 
