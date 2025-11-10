@@ -151,7 +151,6 @@ class StaffCreateView(SupplierSecureMixin, CreateView):
             instance.document_family_name,
             instance.date_of_birth,
             instance.gender_id,
-            instance.email_address,
         ]
         extended_fields = [
             instance.nationality_id,
@@ -160,15 +159,23 @@ class StaffCreateView(SupplierSecureMixin, CreateView):
             instance.document_expiry,
             instance.country_issuing_document_id,
             instance.country_of_birth_id,
-            instance.venue.exists(),  # Must have at least 1 venue
+            instance.email_address,
+            instance.worker_unique_id,
         ]
+
+        # ✅ Conditional rule: if country_of_birth is Italy, then city is required
+        italy_check = False
+        if instance.country_of_birth and instance.country_of_birth.country_name.lower() == "italy":
+            italy_check = bool(instance.place_or_city_of_birth_id)
+        else:
+            italy_check = True  # skip check if not Italy
 
         # Step 1 → Partial (01 Non Completo)
         if all(minimal_fields):
             instance.status = status_non_completo  # stays 01 until fully completed
 
         # Step 2 → Automatic upgrade to 02 Completato
-        if all(minimal_fields) and all(extended_fields):
+        if all(minimal_fields) and all(extended_fields) and italy_check:
             status_completato, _ = Status.objects.get_or_create(status_id="1", defaults={"label": "Completato"})
             instance.status = status_completato
 
