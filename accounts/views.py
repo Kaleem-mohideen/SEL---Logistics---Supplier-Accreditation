@@ -9,13 +9,17 @@ class SupplierLoginView(LoginView):
     def dispatch(self, request, *args, **kwargs):
         # ✅ If user is already logged in, redirect to landing page
         if request.user.is_authenticated:
-            return redirect("staff:landing")  # <--- staff portal landing page
+            return redirect(self.get_success_url())  # <--- staff portal landing page
         
         return super().dispatch(request, *args, **kwargs)
 
     def get_success_url(self):
-        if self.request.user.role == 'reg':
-            return reverse_lazy('admin:index')
+        user = self.request.user
+
+        # ✅ If REG team or Admin — go to Django Admin page
+        if getattr(user, "role", None) == "reg" or user.is_staff or user.is_superuser:
+            return reverse_lazy("admin:index")
+        # ✅ Default for supplier users — go to staff landing page
         return reverse_lazy("staff:landing")
 
 class SupplierLogoutView(LogoutView):
