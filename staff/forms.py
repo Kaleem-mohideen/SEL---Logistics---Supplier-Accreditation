@@ -113,3 +113,13 @@ class StaffMemberForm(forms.ModelForm):
         if data and len(data) > 7:
             raise ValidationError(_("You can select a maximum of 7 venues."))
         return data
+    
+    def clean_worker_unique_id(self):
+        worker_id = self.cleaned_data.get("worker_unique_id")
+        if worker_id:
+            qs = StaffMember.objects.filter(worker_unique_id__iexact=worker_id)
+            if self.instance.pk:
+                qs = qs.exclude(pk=self.instance.pk)  # allow same object on update
+            if qs.exists():
+                raise ValidationError("❌ This Worker Unique ID already exists. Please use a different one.")
+        return worker_id
