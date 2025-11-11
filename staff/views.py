@@ -128,7 +128,7 @@ class StaffCreateView(SupplierSecureMixin, CreateView):
         # 🔹 Generate unique IDs
         next_num = StaffMember.objects.filter(supplier=supplier).count() + 1
         instance.plog_unique_id = f"{supplier.code}{next_num:02d}"
-        instance.worker_unique_id = f"{supplier.code}-{next_num:03d}"
+        # instance.worker_unique_id = f"{supplier.code}-{next_num:03d}"
 
         instance.refresh_from_db()
         instance.save()
