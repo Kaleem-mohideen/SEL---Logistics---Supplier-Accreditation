@@ -69,8 +69,6 @@ class StaffMemberForm(forms.ModelForm):
             "document_family_name",
             "date_of_birth",
             "gender",
-            "email_address",
-            "document_expiry",
         ]
         # Step 3: Mark minimal fields as required and add red asterisk
         for f in minimal_required:

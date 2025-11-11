@@ -130,56 +130,27 @@ class StaffCreateView(SupplierSecureMixin, CreateView):
         instance.plog_unique_id = f"{supplier.code}{next_num:02d}"
         instance.worker_unique_id = f"{supplier.code}-{next_num:03d}"
 
-        # 🔹 Default to "01 Non Completo"
-        status_non_completo, _ = Status.objects.get_or_create(status_id="0", defaults={"label": "Non Completo"})
-        instance.status = status_non_completo
-
+        instance.refresh_from_db()
+        instance.save()
+        # instance.venue.set(form.cleaned_data.get("venue", []))
+        instance.evaluate_completion_status()
+        instance.save()
+        
         # 🔹 Save initially
         response = super().form_valid(form)
-        instance.refresh_from_db()
 
         # 🔹 Rename photograph file (after pk generated)
         if instance.photograph:
             ext = os.path.splitext(instance.photograph.name)[1].lower()
             new_name = f"{instance.document_family_name}_{instance.document_given_name}_{instance.plog_unique_id}{ext}"
-            instance.photograph.name = f"photos/{new_name}"
+            full_path = os.path.join("photos", new_name)
+
+            # Avoid overwriting existing file
+            if default_storage.exists(full_path):
+                default_storage.delete(full_path)
+
+            instance.photograph.name = full_path
             instance.save(update_fields=["photograph"])
-
-        # ✅ Minimal and Extended Mandatory Field Checks
-        minimal_fields = [
-            instance.document_given_name,
-            instance.document_family_name,
-            instance.date_of_birth,
-            instance.gender_id,
-        ]
-        extended_fields = [
-            instance.nationality_id,
-            instance.document_type_id,
-            instance.document_number,
-            instance.document_expiry,
-            instance.country_issuing_document_id,
-            instance.country_of_birth_id,
-            instance.email_address,
-            instance.worker_unique_id,
-        ]
-
-        # ✅ Conditional rule: if country_of_birth is Italy, then city is required
-        italy_check = False
-        if instance.country_of_birth and instance.country_of_birth.country_name.lower() == "italy":
-            italy_check = bool(instance.place_or_city_of_birth_id)
-        else:
-            italy_check = True  # skip check if not Italy
-
-        # Step 1 → Partial (01 Non Completo)
-        if all(minimal_fields):
-            instance.status = status_non_completo  # stays 01 until fully completed
-
-        # Step 2 → Automatic upgrade to 02 Completato
-        if all(minimal_fields) and all(extended_fields) and italy_check:
-            status_completato, _ = Status.objects.get_or_create(status_id="1", defaults={"label": "Completato"})
-            instance.status = status_completato
-
-        instance.save()
 
         # User feedback
         if instance.status.status_id == "1":
@@ -189,44 +160,6 @@ class StaffCreateView(SupplierSecureMixin, CreateView):
 
         return response
 
-# class StaffCreateView1(SupplierSecureMixin, CreateView):
-#     model = StaffMember
-#     form_class = StaffMemberForm
-#     template_name = "staff/staff_form.html"
-#     success_url = reverse_lazy("staff:landing")
-
-#     def get_form_kwargs(self):
-#         """Pass supplier to form so function code auto-fills"""
-#         kwargs = super().get_form_kwargs()
-#         kwargs["supplier"] = self.supplier
-#         return kwargs
-
-#     @transaction.atomic
-#     def form_valid(self, form):
-#         """Final backend verification"""
-#         supplier = self.supplier
-#         form.instance.supplier = supplier
-
-#         # ensure function_code assigned server-side (even though form disabled)
-#         if supplier and supplier.function_code:
-#             # Force function code based on Supplier (ignores hacked values)
-#             form.instance.function_code = supplier.function_code
-
-#         # Generate unique PLOG ID and worker ID
-#         # progressive PLOG ID generation: SupplierCode + next progressive (02 digits)
-#         next_num = StaffMember.objects.filter(supplier=supplier).count() + 1
-#         form.instance.plog_unique_id = f"{supplier.code}{next_num:02d}"
-
-#         # worker_unique_id (internal) example
-#         form.instance.worker_unique_id = f"{supplier.code}-{next_num:03d}"
-
-#         # default status '0' (Non Completo) — ensure Status exists
-#         try:
-#             form.instance.status = Status.objects.get(status_id="0")
-#         except Status.DoesNotExist:
-#             form.instance.status = None
-
-#         return super().form_valid(form)
 
 class StaffUpdateView(SupplierSecureMixin, UpdateView):
     model = StaffMember
@@ -247,13 +180,49 @@ class StaffUpdateView(SupplierSecureMixin, UpdateView):
         obj = self.get_object()
         # prevent edits if status is completed (status_id == '1')
         if obj.status and getattr(obj.status, "status_id", None) == "1":
+            messages.info(request, "✅ This record is already marked as COMPLETATO and cannot be edited.")
             return redirect(self.success_url)
         # ensure supplier matches
         if obj.supplier != self.supplier:
+            messages.warning(request, "You cannot edit staff from another supplier.")
             return redirect(self.success_url)
         return super().dispatch(request, *args, **kwargs)
 
+    @transaction.atomic
     def form_valid(self, form):
-        """Prevent changing function_code via REST call"""
-        form.instance.function_code = self.supplier.function_code
-        return super().form_valid(form)        
+        instance = form.save(commit=False)
+        instance.supplier = self.supplier
+        instance.user = self.request.user  # track who made the update
+        instance.function_code = self.supplier.function_code  # lock to supplier’s function
+
+        # Save first to get PK if not yet saved
+        instance.save()
+
+        # Update many-to-many venue field
+        # instance.venue.set(form.cleaned_data.get("venue", []))
+
+        # 🔹 Recalculate completion status (partial → complete)
+        instance.evaluate_completion_status()
+        instance.save()
+
+        # 🔹 Rename photograph if uploaded again
+        if instance.photograph and not instance.photograph.name.endswith(f"{instance.plog_unique_id}.jpg"):
+            ext = os.path.splitext(instance.photograph.name)[1].lower()
+            new_name = f"{instance.document_family_name}_{instance.document_given_name}_{instance.plog_unique_id}{ext}"
+            full_path = os.path.join("photos", new_name)
+
+            # Avoid overwriting existing file
+            if default_storage.exists(full_path):
+                default_storage.delete(full_path)
+
+            instance.photograph.name = full_path
+            instance.save(update_fields=["photograph"])
+
+        # 🔹 Set messages based on status
+        if instance.status and instance.status.status_id == "1":
+            messages.success(self.request, "✅ Staff record updated and now marked as COMPLETATO.")
+        else:
+            messages.info(self.request, "🕓 Staff record updated (still Non Completo). Fill remaining fields to complete it.")
+
+        return super().form_valid(form)
+  

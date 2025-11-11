@@ -153,6 +153,40 @@ class StaffMember(models.Model):
             return "success"
         return "danger"
 
+    def evaluate_completion_status(self):
+        """Evaluate if record should be marked as Completato based on filled fields."""
+        minimal_fields = [
+            self.document_given_name,
+            self.document_family_name,
+            self.date_of_birth,
+            self.gender_id,
+        ]
+
+        extended_fields = [
+            self.nationality_id,
+            self.document_type_id,
+            self.document_number,
+            self.document_expiry,
+            self.country_issuing_document_id,
+            self.country_of_birth_id,
+            self.email_address,
+            self.worker_unique_id,
+            # self.venue.exists(),  # must have at least one venue
+        ]
+
+        # Conditional rule: if Italy, place of birth is mandatory
+        italy_ok = True
+        if self.country_of_birth and self.country_of_birth.country_name.lower() == "italy":
+            italy_ok = bool(self.place_or_city_of_birth_id)
+
+        if all(minimal_fields) and all(extended_fields) and italy_ok:
+            status_obj, _ = Status.objects.get_or_create(status_id="1", defaults={"label": "Completato"})
+        else:
+            status_obj, _ = Status.objects.get_or_create(status_id="0", defaults={"label": "Non Completo"})
+
+        self.status = status_obj
+        return self.status
+
     def save(self, *args, **kwargs):
         # Assign PLOG UNIQUE ID = SupplierCode + progressive count
         if not self.plog_unique_id:
