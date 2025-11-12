@@ -140,6 +140,14 @@ class StaffMemberAdminForm(forms.ModelForm):
         # but re-populate queryset safely
         self.fields["function_code"].queryset = FunctionCode.objects.all()
 
+        # # Prevent Django from loading DateTimeShortcuts
+        # for field_name in ['date_of_birth', 'document_expiry']:
+        #     print("self.fields", self.fields)
+        #     if field_name in self.fields:
+        #         self.fields[field_name].widget.is_admin_related = False
+        #         self.fields[field_name].widget.attrs['class'] = 'vDateField flatpickr-input'
+
+
 @admin.register(StaffMember)
 class StaffMemberAdmin(admin.ModelAdmin):
     form = StaffMemberAdminForm
@@ -208,7 +216,38 @@ class StaffMemberAdmin(admin.ModelAdmin):
         return obj.user.username if obj.user else "—"
 
     class Media:
-        js = ("js/staff_autofill.js",)
+        # Load Flatpickr library and your custom JS scripts
+        js = [
+            "https://cdn.jsdelivr.net/npm/flatpickr",  # Flatpickr core
+            "js/staff_autofill.js",                   # your existing JS
+            "js/staff_datepicker.js",                 # new date picker enhancements
+        ]
+        css = {
+            "all": [
+                "https://cdn.jsdelivr.net/npm/flatpickr/dist/themes/material_blue.css",
+            ]
+        }
+
+    def formfield_for_dbfield(self, db_field, **kwargs):
+        formfield = super().formfield_for_dbfield(db_field, **kwargs)
+
+        # ✅ Guard 1: Skip fields without form widgets
+        if not formfield:
+            return formfield
+
+        # ✅ Check if widget is a date widget
+        if isinstance(getattr(formfield, "widget", None), admin.widgets.AdminDateWidget):
+            # ✅ Create a subclass of the widget with no media
+            class CleanDateWidget(formfield.widget.__class__):
+                @property
+                def media(self):
+                    # Return empty media to prevent loading admin's calendar.js
+                    return forms.Media(js=[], css={})
+
+            # Replace the widget with our clean one
+            formfield.widget = CleanDateWidget()
+
+        return formfield
 
     # ✅ Add custom admin URL for AJAX calls
     def get_urls(self):
