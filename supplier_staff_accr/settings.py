@@ -164,36 +164,35 @@ USE_TZ = True
 # Static files (CSS, JavaScript, Images)
 # https://docs.djangoproject.com/en/4.2/howto/static-files/
 
+
 # ==============================
 # STATIC FILES CONFIGURATION
 # ==============================
+STATIC_URL = os.getenv("DJANGO_STATIC_URL", "/static/")
 
-# Static URL prefix (usually stays constant)
-STATIC_URL = '/static/'
+# Handle STATICFILES_DIRS (can be comma-separated values)
+static_dirs_env = os.getenv("DJANGO_STATICFILES_DIRS", "")
+STATICFILES_DIRS = [
+    BASE_DIR / d.strip() for d in static_dirs_env.split(",") if d.strip()
+]
 
-# Load static root and dirs from environment
-STATIC_ROOT = env.str("DJANGO_STATIC_ROOT", default=str(BASE_DIR / "staticfiles"))
-
-# Optional: multiple directories for app/static-level overrides
-STATICFILES_DIRS = []
-
-static_dirs_env = env.str("DJANGO_STATICFILES_DIRS", default="")
-if static_dirs_env:
-    # split comma-separated values (e.g., "static,assets")
-    STATICFILES_DIRS = [BASE_DIR / d.strip() for d in static_dirs_env.split(",") if d.strip()]
-
+# Define STATIC_ROOT — where collectstatic will copy all files
+STATIC_ROOT = os.getenv(
+    "DJANGO_STATIC_ROOT",
+    str(BASE_DIR / "staticfiles")  # default for dev
+)
 
 # STATIC_URL = '/static/'
-#dev
+##dev
 # STATICFILES_DIRS = [
 #     BASE_DIR / "static",
 # ]
 # STATIC_ROOT = BASE_DIR / "staticfiles" #dev
 
-# Optional: where Django should look for additional app-level static files
-# (only needed if you have custom static files outside apps)
+## Optional: where Django should look for additional app-level static files
+## (only needed if you have custom static files outside apps)
 
-# admin_change
+## admin_change
 # STATICFILES_DIRS = []
 # STATIC_ROOT = '/webappsDjango/reg2026/SEL---Logistics---Supplier-Accreditation/static/' #prod
 
