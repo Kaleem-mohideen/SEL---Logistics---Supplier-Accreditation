@@ -188,6 +188,13 @@ class StaffMemberAdmin(admin.ModelAdmin):
     #     return format_html(f'<a class="button" href="{url}">⬇ Export Status #1</a>')
     # export_button.short_description = "Export"
 
+    def get_readonly_fields(self, request, obj=None):
+        """Disable editing of user (registered_by) once set."""
+        readonly = list(self.readonly_fields)
+        if obj and obj.user:  # existing record and user already assigned
+            readonly.append("user")
+        return readonly
+
     @admin.display(description="Status")
     def colored_status(self, obj):
         color = obj.status_color()
