@@ -130,7 +130,7 @@ class StaffCreateView(SupplierSecureMixin, CreateView):
         instance.plog_unique_id = f"{supplier.code}{next_num:02d}"
         # instance.worker_unique_id = f"{supplier.code}-{next_num:03d}"
 
-        instance.refresh_from_db()
+        # instance.refresh_from_db()
         instance.save()
         # instance.venue.set(form.cleaned_data.get("venue", []))
         instance.evaluate_completion_status()
