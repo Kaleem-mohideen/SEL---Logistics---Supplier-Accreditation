@@ -123,7 +123,7 @@ class StaffMember(models.Model):
     document_family_name = models.CharField(max_length=25)
     date_of_birth = models.DateField()
     document_number = models.CharField(max_length=20)
-    document_expiry = models.DateField()
+    document_expiry = models.DateField(null=True, blank=True)
     email_address = models.EmailField(max_length=70)
     photograph = models.ImageField(upload_to="photos/")
 

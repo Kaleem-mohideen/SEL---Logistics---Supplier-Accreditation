@@ -14,6 +14,22 @@ from .models import (
 )
 from django.utils.html import format_html
 from django.urls import reverse
+from django import forms
+
+from django.http import JsonResponse
+from django.urls import path
+from accounts.models import Supplier
+
+def get_function_code(request, supplier_code):
+    """Return supplier's assigned function_code for admin auto-fill"""
+    try:
+        supplier = Supplier.objects.get(code=supplier_code)
+        if supplier.function_code:
+            return JsonResponse({"function_code_id": supplier.function_code.id})
+        else:
+            return JsonResponse({"function_code_id": None})
+    except Supplier.DoesNotExist:
+        return JsonResponse({"error": "Supplier not found"}, status=404)
 
 # ✅ Add custom CSS to admin without overriding AdminSite
 admin.site.site_header = "Django administration"
@@ -90,8 +106,43 @@ class StatusAdmin(admin.ModelAdmin):
     search_fields = ("status_id", "label")
     ordering = ("status_id",)
 
+class StaffMemberAdminForm(forms.ModelForm):
+    class Meta:
+        model = StaffMember
+        fields = "__all__"
+
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+        # Make specific fields optional in admin
+        optional_fields = [
+            "function_code",
+            "nationality",
+            "document_type",
+            "country_issuing_document",
+            "country_of_birth",
+            "place_or_city_of_birth",
+            "document_number",
+            "document_expiry",
+            "email_address",
+            "photograph",
+            # "worker_unique_id",
+        ]
+        for field in optional_fields:
+            if field in self.fields:
+                self.fields[field].required = False
+
+        # ✅ Auto-fill Function Code if Supplier already chosen
+        supplier = getattr(self.instance, "supplier", None)
+        if supplier and supplier.function_code:
+            self.fields["function_code"].initial = supplier.function_code.pk
+
+        # ✅ If editing an existing record (supplier locked), keep function_code editable
+        # but re-populate queryset safely
+        self.fields["function_code"].queryset = FunctionCode.objects.all()
+
 @admin.register(StaffMember)
 class StaffMemberAdmin(admin.ModelAdmin):
+    form = StaffMemberAdminForm
     list_display = (
         "plog_unique_id",
         "document_family_name",
@@ -149,6 +200,17 @@ class StaffMemberAdmin(admin.ModelAdmin):
     @admin.display(description="Registered By")
     def registered_by(self, obj):
         return obj.user.username if obj.user else "—"
+
+    class Media:
+        js = ("js/staff_autofill.js",)
+
+    # ✅ Add custom admin URL for AJAX calls
+    def get_urls(self):
+        urls = super().get_urls()
+        custom_urls = [
+            path("get_function_code/<str:supplier_code>/", self.admin_site.admin_view(get_function_code)),
+        ]
+        return custom_urls + urls
 
 @admin.register(ExportLog)
 class ExportLogAdmin(admin.ModelAdmin):
