@@ -4,82 +4,123 @@
 
 {% block extra_css %}
 <style>
-  /* Compact, professional table layout */
+  /* Compact, professional table styling */
   .table {
     font-size: 0.9rem;
-    white-space: nowrap;
+    word-wrap: break-word;
+    white-space: normal;
   }
-  .table th, .table td {
+
+  th, td {
+    max-width: 180px;
+    overflow-wrap: break-word;
+  }
+
+  .table thead th {
+    cursor: pointer;
+    user-select: none;
+    position: relative;
+  }
+
+  .table thead th.sortable::after {
+    content: "⇅";
+    position: absolute;
+    right: 8px;
+    font-size: 0.7rem;
+    color: #999;
+  }
+
+  .table thead th.sorted-asc::after {
+    content: "▲";
+    color: #007bff;
+  }
+
+  .table thead th.sorted-desc::after {
+    content: "▼";
+    color: #007bff;
+  }
+
+  .table td, .table th {
     vertical-align: middle;
     padding: 0.5rem 0.75rem;
   }
+
   .badge {
     font-size: 0.75rem;
   }
+
+  .search-bar {
+    margin-bottom: 1rem;
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.5rem;
+  }
+
+  .search-bar input,
+  .search-bar select {
+    width: 200px;
+    font-size: 0.85rem;
+  }
+
   .btn-sm {
     padding: 0.25rem 0.5rem;
     font-size: 0.8rem;
-  }
-  .table td.text-nowrap {
-    white-space: nowrap;
-  }
-  /* Fit content neatly */
-  th, td {
-    text-overflow: ellipsis;
-    overflow: hidden;
-    max-width: 150px;
-  }
-  /* Reduce spacing for compact view */
-  .container {
-    max-width: 100%;
   }
 </style>
 {% endblock %}
 
 {% block content %}
 <div class="container mt-4">
+
   <div class="d-flex justify-content-between align-items-center mb-3">
     <h4 class="fw-bold text-primary mb-0">Staff Registration</h4>
     <div class="d-flex gap-2">
-      <a class="btn btn-sm btn-success" href="{% url 'staff:create' %}">
-        ➕ Add New Staff
-      </a>
-      <a href="{% url 'staff:export' %}" class="btn btn-sm btn-outline-primary">
-        ⬇ Export to Excel
-      </a>
+      <a class="btn btn-sm btn-success" href="{% url 'staff:create' %}">➕ Add New Staff</a>
+      <a href="{% url 'staff:export' %}" class="btn btn-sm btn-outline-primary">⬇ Export to Excel</a>
     </div>
+  </div>
+
+  <!-- 🔍 Search and Filter Controls -->
+  <div class="search-bar">
+    <input type="text" id="searchInput" class="form-control form-control-sm" placeholder="Search by ID, Name, Venue...">
+    <select id="statusFilter" class="form-select form-select-sm">
+      <option value="">All Statuses</option>
+      <option value="Non Completo">Non Completo</option>
+      <option value="Completato">Completato</option>
+      <option value="In Review">In Review</option>
+    </select>
   </div>
 
   {% if staff_list %}
   <div class="table-responsive shadow-sm rounded">
-    <table class="table table-hover table-striped align-middle">
+    <table class="table table-hover table-striped align-middle" id="staffTable">
       <thead class="table-light text-center align-middle">
         <tr>
-          <th scope="col">PLOG ID</th>
-          <th scope="col">Codice Lavoratore/Matricola</th>
-          <th scope="col">Nome</th>
-          <th scope="col">Data di Nascita</th>
-          <th scope="col">Venue (S)</th>
-          <th scope="col">Status</th>
-          <th scope="col">Creato</th>
-          <th scope="col">Azioni</th>
+          <th class="sortable">PLOG ID</th>
+          <th class="sortable">Codice Lavoratore/Matricola</th>
+          <th class="sortable">Nome</th>
+          <th class="sortable">Data di Nascita</th>
+          <th class="sortable">Venue (S)</th>
+          <th class="sortable">Status</th>
+          <th class="sortable">Creato</th>
+          <th>Azioni</th>
         </tr>
       </thead>
       <tbody>
         {% for s in staff_list %}
         <tr>
-          <td class="fw-semibold text-primary">{{ s.plog_unique_id }}</td>
-          <td class="text-secondary">{{ s.worker_unique_id|default:"—" }}</td>
-          <td class="text-nowrap">{{ s.document_family_name }} {{ s.document_given_name }}</td>
-          <td class="text-nowrap">{{ s.date_of_birth|date:"Y-m-d" }}</td>
-          <td class="text-nowrap">
+          <td>{{ s.plog_unique_id }}</td>
+          <td>{{ s.worker_unique_id|default:"—" }}</td>
+          <td>{{ s.document_family_name }} {{ s.document_given_name }}</td>
+          <td>{{ s.date_of_birth|date:"Y-m-d" }}</td>
+          <td>
             {% for v in s.venue.all %}
               <span class="badge bg-secondary">{{ v.code }}</span>
             {% empty %}
               <span class="text-muted">—</span>
             {% endfor %}
           </td>
-          <td class="text-center">
+          <td>
             {% if s.status %}
               <span class="badge
                 {% if s.status.status_id == '0' %} bg-warning text-dark
@@ -90,12 +131,10 @@
               </span>
             {% endif %}
           </td>
-          <td class="text-nowrap">{{ s.created_at|date:"Y-m-d H:i" }}</td>
-          <td class="text-center">
+          <td>{{ s.created_at|date:"Y-m-d H:i" }}</td>
+          <td>
             {% if s.status and s.status.status_id != '1' %}
-              <a class="btn btn-sm btn-outline-primary" href="{% url 'staff:edit' s.pk %}">
-                Edit
-              </a>
+              <a class="btn btn-sm btn-outline-primary" href="{% url 'staff:edit' s.pk %}">Edit</a>
             {% else %}
               <button class="btn btn-sm btn-outline-secondary" disabled>Locked</button>
             {% endif %}
@@ -117,20 +156,76 @@
   <nav class="mt-3">
     <ul class="pagination pagination-sm justify-content-center mb-0">
       {% if page_obj.has_previous %}
-        <li class="page-item">
-          <a class="page-link" href="?page={{ page_obj.previous_page_number }}">Previous</a>
-        </li>
+        <li class="page-item"><a class="page-link" href="?page={{ page_obj.previous_page_number }}">Previous</a></li>
       {% endif %}
-      <li class="page-item active">
-        <span class="page-link">{{ page_obj.number }}</span>
-      </li>
+      <li class="page-item active"><span class="page-link">{{ page_obj.number }}</span></li>
       {% if page_obj.has_next %}
-        <li class="page-item">
-          <a class="page-link" href="?page={{ page_obj.next_page_number }}">Next</a>
-        </li>
+        <li class="page-item"><a class="page-link" href="?page={{ page_obj.next_page_number }}">Next</a></li>
       {% endif %}
     </ul>
   </nav>
   {% endif %}
 </div>
+{% endblock %}
+
+{% block extra_js %}
+<script>
+  // 🔹 SORTING
+  document.addEventListener("DOMContentLoaded", function() {
+    const table = document.getElementById("staffTable");
+    const headers = table.querySelectorAll("th.sortable");
+    let currentSort = { index: null, direction: null };
+
+    headers.forEach((header, index) => {
+      header.addEventListener("click", () => {
+        const tbody = table.querySelector("tbody");
+        const rows = Array.from(tbody.querySelectorAll("tr"));
+        const asc = currentSort.index !== index || currentSort.direction !== "asc";
+
+        rows.sort((a, b) => {
+          const aText = a.children[index].innerText.toLowerCase();
+          const bText = b.children[index].innerText.toLowerCase();
+          return asc ? aText.localeCompare(bText) : bText.localeCompare(aText);
+        });
+
+        headers.forEach(h => h.classList.remove("sorted-asc", "sorted-desc"));
+        header.classList.add(asc ? "sorted-asc" : "sorted-desc");
+
+        tbody.innerHTML = "";
+        rows.forEach(row => tbody.appendChild(row));
+
+        currentSort = { index, direction: asc ? "asc" : "desc" };
+      });
+    });
+  });
+
+  // 🔹 SEARCH + FILTER
+  document.addEventListener("DOMContentLoaded", function() {
+    const searchInput = document.getElementById("searchInput");
+    const statusFilter = document.getElementById("statusFilter");
+    const table = document.getElementById("staffTable");
+    const rows = table.querySelectorAll("tbody tr");
+
+    function filterTable() {
+      const searchTerm = searchInput.value.toLowerCase();
+      const statusValue = statusFilter.value.toLowerCase();
+
+      rows.forEach(row => {
+        const text = row.innerText.toLowerCase();
+        const statusText = row.children[5].innerText.toLowerCase();
+        const matchSearch = !searchTerm || text.includes(searchTerm);
+        const matchStatus = !statusValue || statusText.includes(statusValue);
+
+        if (matchSearch && matchStatus) {
+          row.style.display = "";
+        } else {
+          row.style.display = "none";
+        }
+      });
+    }
+
+    searchInput.addEventListener("keyup", filterTable);
+    statusFilter.addEventListener("change", filterTable);
+  });
+</script>
 {% endblock %}
