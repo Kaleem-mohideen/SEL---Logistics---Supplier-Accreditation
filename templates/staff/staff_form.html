@@ -52,7 +52,13 @@
         <div class="col-md-6">
           <label class="form-label">Select {{ form.venue.label }}s <small class="text-muted"> (max 7)</small></label>
           {{ form.venue }}
-          <small id="venue-help" class="form-text text-muted">Search and press Enter to add a venue. Selected items appear as tags.</small>
+            {% if form.venue.field.disabled %}
+              <small class="text-danger">
+                ⚠ Venue selection disabled for your supplier account.
+              </small>
+            {% else %}
+              <small id="venue-help" class="form-text text-muted">Search and press Enter to add a venue. Selected items appear as tags.</small>
+            {% endif %}
         </div>
 
         <!-- Personal info -->

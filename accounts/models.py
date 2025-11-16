@@ -51,6 +51,17 @@ class Supplier(models.Model):
     def __str__(self):
         return f"{self.code} - {self.name}"
 
+class DisabledVenueSupplier(models.Model):
+    supplier = models.OneToOneField(
+        'accounts.Supplier',
+        on_delete=models.CASCADE,
+        related_name='venue_disabled_rule'
+    )
+    reason = models.CharField(max_length=255, blank=True, help_text="Optional note for why venue is disabled")
+
+    def __str__(self):
+        return f"{self.supplier.code} - Venue Disabled"
+
 class User(AbstractUser):
     supplier = models.ForeignKey(Supplier, on_delete=models.CASCADE, related_name='users')
     user_code = models.CharField(max_length=2)  # 01–99

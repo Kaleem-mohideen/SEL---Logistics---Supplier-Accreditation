@@ -3,6 +3,7 @@ from django import forms
 from .models import StaffMember, Venue, FunctionCode
 from django.core.exceptions import ValidationError
 from django.utils.translation import gettext_lazy as _
+from accounts.models import DisabledVenueSupplier
 
 
 class StaffMemberForm(forms.ModelForm):
@@ -59,6 +60,7 @@ class StaffMemberForm(forms.ModelForm):
         supplier = kwargs.pop("supplier", None)
         super().__init__(*args, **kwargs)
 
+
         # Mark all fields optional initially
         for field in self.fields.values():
             field.required = False
@@ -83,6 +85,12 @@ class StaffMemberForm(forms.ModelForm):
 
         # If a supplier instance provided, auto-assign and lock function_code
         if supplier is not None:
+            # If supplier is known, check if in DisabledVenueSupplier table
+            if DisabledVenueSupplier.objects.filter(supplier=supplier).exists():
+                self.fields["venue"].disabled = True
+                self.fields["venue"].help_text = (
+                    "⚠️ Venue selection disabled for this supplier (controlled externally)."
+                )            
             # supplier.function_code is FunctionCode or None
             if supplier.function_code:
                 self.fields["function_code"].initial = supplier.function_code.pk
