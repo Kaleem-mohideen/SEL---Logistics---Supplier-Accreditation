@@ -38,6 +38,17 @@ class Nationality(models.Model):
     def __str__(self):
         return self.country_name
 
+class DocumentTypeRestriction(models.Model):
+    nationality = models.ForeignKey(
+        Nationality,
+        on_delete=models.CASCADE,
+        related_name="document_restrictions"
+    )
+    allow_identity_card = models.BooleanField(default=True)
+
+    def __str__(self):
+        return f"{self.nationality.country_name} — ID Allowed: {self.allow_identity_card}"
+
 
 class Document(models.Model):
     type_name = models.CharField(max_length=100)

@@ -1,10 +1,49 @@
 # staff/forms.py
 from django import forms
-from .models import StaffMember, Venue, FunctionCode
+from .models import StaffMember, Venue, FunctionCode, DocumentTypeRestriction, Document, Nationality
 from django.core.exceptions import ValidationError
 from django.utils.translation import gettext_lazy as _
 from accounts.models import DisabledVenueSupplier
 
+
+class DocumentTypeRestrictionAdminForm(forms.ModelForm):
+    class Meta:
+        model = DocumentTypeRestriction
+        fields = "__all__"
+
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+
+        used_nationalities = DocumentTypeRestriction.objects.values_list(
+            "nationality_id", flat=True
+        )
+
+        # If editing an existing entry — lock nationality field
+        if self.instance.pk:
+            # Disable editing nationality
+            self.fields["nationality"].widget.attrs["disabled"] = True
+
+            # Preload the existing selected value only
+            self.fields["nationality"].queryset = Nationality.objects.filter(
+                id=self.instance.nationality_id
+            )
+
+        else:
+            # Creating new restriction → exclude used nationalities
+            self.fields["nationality"].queryset = Nationality.objects.exclude(
+                id__in=used_nationalities
+            )
+
+    def clean_nationality(self):
+        """
+        When field is disabled, HTML will not submit its value.
+        So we must return the existing nationality instance manually.
+        """
+        if self.instance.pk:  # editing → keep old value
+            return self.instance.nationality
+        
+        # creating new → return the chosen nationality
+        return self.cleaned_data.get("nationality")
 
 class StaffMemberForm(forms.ModelForm):
 
@@ -99,6 +138,42 @@ class StaffMemberForm(forms.ModelForm):
             else:
                 # allow choice if supplier has no function_code
                 self.fields["function_code"].queryset = FunctionCode.objects.all()
+
+        all_docs = Document.objects.all()
+
+        # Detect nationality on:
+        # - Edit form (instance has nationality)
+        # - POST submission
+        # - GET initial load
+        nationality_id = None
+        print("self.instance.nationality_id", self.instance.nationality_id)
+        if self.instance and self.instance.pk and self.instance.nationality_id:
+            nationality_id = self.instance.nationality_id
+        elif "nationality" in self.data:
+            nationality_id = self.data.get("nationality")
+        elif "nationality" in self.initial:
+            nationality_id = self.initial.get("nationality")
+
+        if nationality_id:
+            self.apply_doc_rules(nationality_id, all_docs)
+
+    def apply_doc_rules(self, nationality_id, all_docs):
+        """Apply passport-only restriction based on nationality rules."""
+        restriction = DocumentTypeRestriction.objects.filter(
+            nationality_id=nationality_id
+        ).first()
+
+        # Passport-only case:
+        if not restriction or not restriction.allow_identity_card:
+            self.fields["document_type"].queryset = all_docs.filter(
+                type_name__icontains="passport"
+            )
+            self.fields["document_type"].widget.attrs.update({"data-passport-only": "1"})
+            return
+
+        # Identity card allowed:
+        self.fields["document_type"].queryset = all_docs
+        self.fields["document_type"].widget.attrs.update({"data-passport-only": "0"})
 
     def clean_photograph(self):
         file = self.cleaned_data.get("photograph")

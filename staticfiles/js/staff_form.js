@@ -1,6 +1,8 @@
 // static/js/staff_form.js
 document.addEventListener("DOMContentLoaded", function () {
-
+  /* ---------------------------------------------------
+      1) Venue Select2 + limit 7
+  --------------------------------------------------- */
   // Initialize Select2 on venue-select
   if (typeof $ !== "undefined" && $(".venue-select").length) {
     $(".venue-select").select2({
@@ -26,6 +28,10 @@ document.addEventListener("DOMContentLoaded", function () {
     });
   }
 
+  /* ---------------------------------------------------
+      2) Disable Place of Birth unless Italy
+  --------------------------------------------------- */
+  
     // Disable Place of Birth when not Italy
   $("#id_country_of_birth").on("change", function () {
     const selected = $("#id_country_of_birth option:selected").text().trim().toLowerCase();
@@ -38,7 +44,50 @@ document.addEventListener("DOMContentLoaded", function () {
     }
   }).trigger("change");
 
+    /* ---------------------------------------------------
+      3) AJAX: Document Type Rules based on Nationality
+  --------------------------------------------------- */
+  $("#id_nationality").on("change", function () {
+    console.log(here in nation);
+    let nationalityId = $(this).val();
 
+    if (!nationalityId) return;
+
+    $.ajax({
+      url: "/staff/check-document-rules/" + nationalityId + "/",
+      method: "GET",
+      success: function (data) {
+        let documentSelect = $("#id_document_type");
+
+        // Clear and rebuild document type options
+        documentSelect.empty();
+
+        data.options.forEach(opt => {
+          documentSelect.append(
+            `<option value="${opt.id}">${opt.name}</option>`
+          );
+        });
+
+        // Passport only case
+        $("#doc-warning").remove();
+        if (data.passport_only) {
+          documentSelect.after(
+            '<small id="doc-warning" class="text-danger">⚠️ Solo il Passaporto è accettato per questa nazionalità.</small>'
+          );
+        }
+      },
+      error: function () {
+        console.error("Document type rule AJAX failed.");
+      }
+    });
+  }).trigger("change");
+
+  // Trigger once on page load (useful for edit mode)
+  // $("#id_nationality").trigger("change");
+
+  /* ---------------------------------------------------
+      4) Photo file validation + preview
+  --------------------------------------------------- */
   // Photo preview + size/type validation
   const photoInput = document.getElementById("id_photograph");
   if (photoInput) {
@@ -76,6 +125,10 @@ document.addEventListener("DOMContentLoaded", function () {
       reader.readAsDataURL(f);
     });
   }
+
+    /* ---------------------------------------------------
+      5) Prevent double submit
+  --------------------------------------------------- */
 
   // Prevent accidental form double-submit and show spinner
   const form = document.getElementById("staff-form");

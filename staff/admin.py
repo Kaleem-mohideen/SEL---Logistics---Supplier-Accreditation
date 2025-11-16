@@ -4,6 +4,7 @@ from .models import (
     Venue,
     Gender,
     Nationality,
+    DocumentTypeRestriction,
     Document,
     CountryIssuingDocument,
     CountryOfBirth,
@@ -19,6 +20,7 @@ from django import forms
 from django.http import JsonResponse
 from django.urls import path
 from accounts.models import Supplier
+from .forms import DocumentTypeRestrictionAdminForm
 
 def get_function_code(request, supplier_code):
     """Return supplier's assigned function_code for admin auto-fill"""
@@ -70,6 +72,13 @@ class NationalityAdmin(admin.ModelAdmin):
     list_display = ("code", "country_name")
     search_fields = ("code", "country_name")
     ordering = ("country_name",)
+
+@admin.register(DocumentTypeRestriction)
+class DocumentTypeRestrictionAdmin(admin.ModelAdmin):
+    form = DocumentTypeRestrictionAdminForm
+    list_display = ("nationality", "allow_identity_card")
+    list_filter = ("allow_identity_card",)
+    search_fields = ("nationality__country_name", "nationality__code")
 
 
 @admin.register(Document)

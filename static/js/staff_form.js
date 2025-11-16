@@ -1,6 +1,8 @@
 // static/js/staff_form.js
 document.addEventListener("DOMContentLoaded", function () {
-
+  /* ---------------------------------------------------
+      1) Venue Select2 + limit 7
+  --------------------------------------------------- */
   // Initialize Select2 on venue-select
   if (typeof $ !== "undefined" && $(".venue-select").length) {
     $(".venue-select").select2({
@@ -26,6 +28,10 @@ document.addEventListener("DOMContentLoaded", function () {
     });
   }
 
+  /* ---------------------------------------------------
+      2) Disable Place of Birth unless Italy
+  --------------------------------------------------- */
+  
     // Disable Place of Birth when not Italy
   $("#id_country_of_birth").on("change", function () {
     const selected = $("#id_country_of_birth option:selected").text().trim().toLowerCase();
@@ -38,7 +44,87 @@ document.addEventListener("DOMContentLoaded", function () {
     }
   }).trigger("change");
 
+    /* ---------------------------------------------------
+      3) AJAX: Document Type Rules based on Nationality
+  --------------------------------------------------- */
+  $("#id_nationality").on("change", function () {
 
+        let nationalityId = $(this).val();
+        let documentSelect = $("#id_document_type");
+
+        // CASE 1: Nationality is empty ("---------")
+        if (!nationalityId) {
+            $("#doc-warning").remove();
+
+            // Restore all document types (full list)
+            $.ajax({
+                url: "/staff/check-document-rules/all/",
+                method: "GET",
+                success: function (data) {
+                    documentSelect.empty();
+
+                    // Always re-add blank option
+                    documentSelect.append('<option value="">---------</option>');
+
+                    // Add all available document types
+                    data.options.forEach(opt => {
+                        documentSelect.append(
+                            `<option value="${opt.id}">${opt.name}</option>`
+                        );
+                    });
+
+                    // Reset selection to blank
+                    documentSelect.val("");
+                }
+            });
+
+            return; // stop here for blank nationality
+        }
+
+        // CASE 2: Normal AJAX processing for valid nationality
+        $.ajax({
+            url: "/staff/check-document-rules/" + nationalityId + "/",
+            method: "GET",
+            success: function (data) {
+                let previousValue = documentSelect.val();  // keep selection
+
+                documentSelect.empty();
+
+                // add placeholder
+                documentSelect.append('<option value="">---------</option>');
+
+                // add options
+                data.options.forEach(opt => {
+                    documentSelect.append(
+                        `<option value="${opt.id}">${opt.name}</option>`
+                    );
+                });
+
+                // restore previous selection if still valid
+                if (data.options.some(opt => opt.id == previousValue)) {
+                    documentSelect.val(previousValue);
+                } else {
+                    documentSelect.val("");
+                }
+
+                // warning
+                $("#doc-warning").remove();
+                if (data.passport_only) {
+                    documentSelect.after(
+                        '<small id="doc-warning" class="text-danger">⚠️ Solo il Passaporto è accettato per questa nazionalità.</small>'
+                    );
+                }
+            }
+        });
+
+    });
+
+  // Trigger once on page load (useful for edit mode)
+  $("#id_nationality").trigger("change");
+
+  /* ---------------------------------------------------
+      4) Photo file validation + preview
+  --------------------------------------------------- */
   // Photo preview + size/type validation
   const photoInput = document.getElementById("id_photograph");
   if (photoInput) {
@@ -76,6 +162,10 @@ document.addEventListener("DOMContentLoaded", function () {
       reader.readAsDataURL(f);
     });
   }
+
+    /* ---------------------------------------------------
+      5) Prevent double submit
+  --------------------------------------------------- */
 
   // Prevent accidental form double-submit and show spinner
   const form = document.getElementById("staff-form");

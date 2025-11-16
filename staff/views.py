@@ -3,7 +3,7 @@ from django.shortcuts import redirect, get_object_or_404
 from django.urls import reverse_lazy
 from django.contrib.auth.mixins import LoginRequiredMixin
 from django.db import transaction
-from .models import StaffMember, Status, ExportLog
+from .models import StaffMember, Status, ExportLog, Document, DocumentTypeRestriction
 
 # from accounts.models import Supplier
 from .forms import StaffMemberForm
@@ -13,12 +13,37 @@ from django.utils.timezone import now
 from django.contrib.admin.views.decorators import staff_member_required
 
 from .export_utils import export_staff_data
-from django.http import FileResponse
+from django.http import FileResponse, JsonResponse
 from django.contrib import messages
 from pathlib import Path
 from django.conf import settings
 import os
 
+
+def check_document_rules_all(request):
+    docs = Document.objects.all()
+    return JsonResponse({
+        "options": [{"id": d.id, "name": d.type_name} for d in docs],
+        "passport_only": False
+    })
+
+def check_document_rules(request, nationality_id):
+    docs = Document.objects.all()
+
+    restriction = DocumentTypeRestriction.objects.filter(
+        nationality_id=nationality_id
+    ).first()
+
+    passport_only = False
+
+    if not restriction or not restriction.allow_identity_card:
+        docs = docs.filter(type_name__icontains="passport")
+        passport_only = True
+
+    return JsonResponse({
+        "options": [{"id": d.id, "name": d.type_name} for d in docs],
+        "passport_only": passport_only
+    })
 
 def export_staff(request):
     filename, status = export_staff_data(request.user)
