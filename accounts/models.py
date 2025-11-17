@@ -39,6 +39,9 @@ class Supplier(models.Model):
     code = models.CharField(max_length=10, primary_key=True)  # e.g. SA02
     name = models.CharField(max_length=255)
 
+    # NEW FIELD
+    allow_frontend_export = models.BooleanField(default=False)
+    
     # ✅ Add FunctionCode FK here
     function_code = models.ForeignKey(
         "staff.FunctionCode",

@@ -32,12 +32,23 @@ def enable_venue_selection(modeladmin, request, queryset):
 
 @admin.register(Supplier)
 class SupplierAdmin(admin.ModelAdmin):
-    list_display = ('row_number', 'code', 'name', 'function_code')
+    list_display = ('row_number', 'code', 'name', 'function_code', "allow_frontend_export")
+    list_editable = ("allow_frontend_export",)
     search_fields = ('code', 'name')
     ordering = ('code',)
-    actions = [disable_venue_selection, enable_venue_selection]
+    actions = [disable_venue_selection, enable_venue_selection, "enable_export_for_selected", "disable_export_for_selected"]
 
     _counter = count()
+
+    @admin.action(description="Enable frontend export for selected suppliers")
+    def enable_export_for_selected(self, request, queryset):
+        updated = queryset.update(allow_frontend_export=True)
+        self.message_user(request, f"{updated} suppliers enabled for frontend export.")
+
+    @admin.action(description="Disable frontend export for selected suppliers")
+    def disable_export_for_selected(self, request, queryset):
+        updated = queryset.update(allow_frontend_export=False)
+        self.message_user(request, f"{updated} suppliers disabled for frontend export.")    
 
     def row_number(self, obj):
         return next(self._counter)

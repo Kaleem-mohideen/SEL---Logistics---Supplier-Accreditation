@@ -46,6 +46,14 @@ def check_document_rules(request, nationality_id):
     })
 
 def export_staff(request):
+    
+    supplier = getattr(request.user, "supplier", None)
+
+    # BLOCK EXPORT unless supplier has permission turned on
+    if not supplier or not supplier.allow_frontend_export:
+        messages.error(request, "Export disabled by Administrator.")
+        return redirect("staff:landing")
+
     filename, status = export_staff_data(request.user)
 
     if status == "NO_RECORDS":

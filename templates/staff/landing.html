@@ -87,7 +87,16 @@
     <h4 class="fw-bold text-primary mb-0">Staff Registration</h4>
     <div class="d-flex gap-2">
       <a class="btn btn-sm btn-success" href="{% url 'staff:create' %}">➕ Add New Staff</a>
-      <a href="{% url 'staff:export' %}" class="btn btn-sm btn-outline-primary">⬇ Export to Excel</a>
+      {% if request.user.supplier.allow_frontend_export %}
+          <a href="{% url 'staff:export' %}" class="btn btn-sm btn-outline-primary">
+              ⬇ Export to Excel
+          </a>
+      {% else %}
+          <button class="btn btn-sm btn-outline-secondary" disabled
+                  title="Export disabled by Administrator">
+              ⬇ Export Disabled
+          </button>
+      {% endif %}
     </div>
   </div>
 
