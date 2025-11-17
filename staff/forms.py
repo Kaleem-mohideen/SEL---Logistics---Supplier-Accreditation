@@ -99,7 +99,8 @@ class StaffMemberForm(forms.ModelForm):
         supplier = kwargs.pop("supplier", None)
         super().__init__(*args, **kwargs)
 
-
+        for f in ["olympic_request", "paralympic_request"]:
+            self.fields[f].widget.attrs.update({"class": "form-check-input"})
         # Mark all fields optional initially
         for field in self.fields.values():
             field.required = False

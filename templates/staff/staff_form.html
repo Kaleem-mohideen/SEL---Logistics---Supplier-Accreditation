@@ -33,16 +33,24 @@
         {{ form.non_field_errors }}
 
         <!-- Request type -->
-        <div class="col-md-6 form-check">
-          <label class="form-check-label">
-            {{ form.olympic_request }} Richiesta Olimpiadi
-          </label>
+        <div class="col-md-6">
+            <div class="form-check form-switch">
+                {{ form.olympic_request }}
+                <label class="form-check-label" for="id_olympic_request">
+                    Richiesta Olimpiadi
+                </label>
+            </div>
         </div>
-        <div class="col-md-6 form-check">
-          <label class="form-check-label">
-            {{ form.paralympic_request }} Richiesta Paralimpiadi
-          </label>
+
+        <div class="col-md-6">
+            <div class="form-check form-switch">
+                {{ form.paralympic_request }}
+                <label class="form-check-label" for="id_paralympic_request">
+                    Richiesta Paralimpiadi
+                </label>
+            </div>
         </div>
+
 
         <!-- Function and venue -->
         <div class="col-md-6">

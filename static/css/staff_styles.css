@@ -30,4 +30,59 @@
   border-radius: 0.25rem;
 }
 
+/* ============================
+   PERFECT IN-BORDER iOS SWITCH
+   ============================ */
 
+.form-switch .form-check-input {
+    width: 3rem !important;          /* track width */
+    margin-left: 0 !important;  /* reset bootstrap offset */
+    height: 1.5rem;        /* track height */
+    background-color: #6c757d;
+    border: none;
+    border-radius: 1.5rem;
+    cursor: pointer;
+    position: relative;
+    appearance: none;
+    transition: background-color .25s ease;
+    outline: none;
+    box-shadow: inset 0 0 4px rgba(0,0,0,0.3); /* soft inner shadow */
+}
+
+/* Knob fully inside the track */
+.form-switch .form-check-input::after {
+    content: "";
+    position: absolute;
+    top: 0.15rem;          /* vertical alignment */
+    left: 0.15rem;         /* left offset */
+    width: 1.2rem;         /* knob size */
+    height: 1.2rem;
+    background: white;
+    border-radius: 50%;
+    transition: transform .25s ease;
+    box-shadow: 0 1px 3px rgba(0,0,0,.3);
+}
+
+/* ON state */
+.form-switch .form-check-input:checked {
+    background-color: #0d6efd !important;
+}
+
+/* Move knob inside track fully */
+.form-switch .form-check-input:checked::after {
+    transform: translateX(1.5rem); /* MUST BE track_width - knob_size - left_offset*2 */
+}
+
+/* Dark mode support */
+body.dark-mode .form-switch .form-check-input {
+    background-color: #444;
+}
+body.dark-mode .form-switch .form-check-input:checked {
+    background-color: #4da3ff !important;
+}
+
+/* Label formatting */
+.form-switch .form-check-label {
+    font-weight: normal !important;
+    margin-left: 8px;
+}
