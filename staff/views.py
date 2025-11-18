@@ -18,6 +18,7 @@ from django.contrib import messages
 from pathlib import Path
 from django.conf import settings
 import os
+from django.core.files.storage import default_storage
 
 
 def check_document_rules_all(request):
