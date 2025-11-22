@@ -181,9 +181,9 @@ class StaffMemberForm(forms.ModelForm):
         # if not file:
         #     raise ValidationError(_("Photograph is required."))
         # size limit 600MB
-        limit = 600 * 1024 * 1024
+        limit = 3 * 1024 * 1024
         if file and file.size > limit:
-            raise ValidationError(_("File too large ( > 600MB )."))
+            raise ValidationError(_("File too large ( > 300MB )."))
         # content type
         # Only validate content_type if this is an uploaded file
         if file and hasattr(file, 'content_type'):
