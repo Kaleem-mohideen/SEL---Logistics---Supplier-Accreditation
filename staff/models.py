@@ -174,6 +174,8 @@ class StaffMember(models.Model):
         ]
 
         extended_fields = [
+            self.olympic_request,
+            self.paralympic_request,
             self.nationality_id,
             self.document_type_id,
             self.document_number,
