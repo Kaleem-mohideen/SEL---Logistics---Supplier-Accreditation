@@ -168,6 +168,13 @@ USE_TZ = True
 
 
 # ==============================
+# MEDIA FILES CONFIGURATION
+# ==============================
+MEDIA_URL = "/media/"
+
+MEDIA_ROOT = os.path.join(BASE_DIR, "media")
+
+# ==============================
 # STATIC FILES CONFIGURATION
 # ==============================
 STATIC_URL = os.getenv("DJANGO_STATIC_URL", "/static/")

@@ -167,7 +167,6 @@ class StaffCreateView(SupplierSecureMixin, CreateView):
 
         # Save the logged-in user performing registration
         instance.user = self.request.user
-
         # 🔹 Assign function_code from supplier securely
         if supplier and supplier.function_code:
             instance.function_code = supplier.function_code
@@ -178,25 +177,34 @@ class StaffCreateView(SupplierSecureMixin, CreateView):
         # instance.worker_unique_id = f"{supplier.code}-{next_num:03d}"
 
         # instance.refresh_from_db()
+        # Save instance so photograph gets a file path
         instance.save()
         # instance.venue.set(form.cleaned_data.get("venue", []))
+        # Evaluate completion status
         instance.evaluate_completion_status()
         instance.save()
         
-        # 🔹 Save initially
-        response = super().form_valid(form)
-
+        # ---- Renaming the photograph ON DISK ----
         # 🔹 Rename photograph file (after pk generated)
         if instance.photograph:
-            ext = os.path.splitext(instance.photograph.name)[1].lower()
-            new_name = f"{instance.document_family_name}_{instance.document_given_name}_{instance.plog_unique_id}{ext}"
-            full_path = os.path.join("photos", new_name)
+            old_path = instance.photograph.path
+            ext = os.path.splitext(old_path)[1].lower()
+            new_filename = f"{instance.document_family_name}_{instance.document_given_name}_{instance.plog_unique_id}{ext}"
+            new_relative_path = os.path.join("photos", new_filename)
+            new_full_path = os.path.join(settings.MEDIA_ROOT, new_relative_path)
 
-            # Avoid overwriting existing file
-            if default_storage.exists(full_path):
-                default_storage.delete(full_path)
+            # Ensure destination directory exists
+            os.makedirs(os.path.dirname(new_full_path), exist_ok=True)
 
-            instance.photograph.name = full_path
+            # Move/rename actual file
+            if os.path.exists(old_path):
+                # If old file exists → remove it first
+                if os.path.exists(new_full_path):
+                    os.remove(new_full_path)
+                os.rename(old_path, new_full_path)
+
+            # Update model field
+            instance.photograph.name = new_relative_path
             instance.save(update_fields=["photograph"])
 
         # User feedback
@@ -205,7 +213,7 @@ class StaffCreateView(SupplierSecureMixin, CreateView):
         else:
             messages.info(self.request, "🕓 Partial save successful (Non Completo). You can complete it later.")
 
-        return response
+        return super().form_valid(form)
 
 
 class StaffUpdateView(SupplierSecureMixin, UpdateView):
@@ -242,6 +250,13 @@ class StaffUpdateView(SupplierSecureMixin, UpdateView):
         instance.user = self.request.user  # track who made the update
         instance.function_code = self.supplier.function_code  # lock to supplier’s function
 
+        old_photo_path = None
+        if instance.pk and instance.photograph:
+            try:
+                old_photo_path = instance.photograph.path
+            except Exception:
+                old_photo_path = None
+
         # Save first to get PK if not yet saved
         instance.save()
 
@@ -252,18 +267,32 @@ class StaffUpdateView(SupplierSecureMixin, UpdateView):
         instance.evaluate_completion_status()
         instance.save()
 
-        # 🔹 Rename photograph if uploaded again
-        if instance.photograph and not instance.photograph.name.endswith(f"{instance.plog_unique_id}.jpg"):
-            ext = os.path.splitext(instance.photograph.name)[1].lower()
-            new_name = f"{instance.document_family_name}_{instance.document_given_name}_{instance.plog_unique_id}{ext}"
-            full_path = os.path.join("photos", new_name)
+        # ---- Renaming logic only if a NEW file was uploaded ----
+        new_file = form.cleaned_data.get("photograph")
 
-            # Avoid overwriting existing file
-            if default_storage.exists(full_path):
-                default_storage.delete(full_path)
+        if new_file and hasattr(new_file, "name"):
+            # a NEW file uploaded → rename it
+            try:
+                new_uploaded_path = instance.photograph.path
+            except Exception:
+                new_uploaded_path = None
 
-            instance.photograph.name = full_path
-            instance.save(update_fields=["photograph"])
+            if new_uploaded_path and os.path.exists(new_uploaded_path):
+                ext = os.path.splitext(new_uploaded_path)[1].lower()
+                new_filename = f"{instance.document_family_name}_{instance.document_given_name}_{instance.plog_unique_id}{ext}"
+                new_relative_path = os.path.join("photos", new_filename)
+                new_full_path = os.path.join(settings.MEDIA_ROOT, new_relative_path)
+
+                # Ensure directory exists
+                os.makedirs(os.path.dirname(new_full_path), exist_ok=True)
+
+                # 🔥 FIX: If target file already exists, delete it before rename
+                if os.path.exists(new_full_path):
+                    os.remove(new_full_path)
+
+                os.rename(new_uploaded_path, new_full_path)
+                instance.photograph.name = new_relative_path
+                instance.save(update_fields=["photograph"])
 
         # 🔹 Set messages based on status
         if instance.status and instance.status.status_id == "1":
