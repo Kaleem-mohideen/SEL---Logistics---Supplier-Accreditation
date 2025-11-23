@@ -279,7 +279,11 @@ class StaffMemberForm(forms.ModelForm):
         file = self.cleaned_data.get("photograph")
         # if not file:
         #     raise ValidationError(_("Photograph is required."))
-        # size limit 600MB
+
+        # If NO new file uploaded → skip validation, do NOT touch existing file
+        if not file or not hasattr(file, "size"):
+            return file
+        # size limit 3MB
         limit = 3 * 1024 * 1024
         if file and file.size > limit:
             raise ValidationError(_("File too large ( > 300MB )."))
