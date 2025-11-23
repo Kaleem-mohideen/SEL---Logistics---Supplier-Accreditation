@@ -12,6 +12,7 @@ from .models import (
     Status,
     StaffMember,
     ExportLog,
+    DocumentExpiryRule,
 )
 from django.utils.html import format_html
 from django.urls import reverse
@@ -20,7 +21,8 @@ from django import forms
 from django.http import JsonResponse
 from django.urls import path
 from accounts.models import Supplier
-from .forms import DocumentTypeRestrictionAdminForm
+from .forms import DocumentTypeRestrictionAdminForm, DocumentExpiryRuleForm
+
 
 def get_function_code(request, supplier_code):
     """Return supplier's assigned function_code for admin auto-fill"""
@@ -45,6 +47,18 @@ class CustomAdminMedia:
 # ✅ Apply to all ModelAdmins dynamically
 for model, model_admin in admin.site._registry.items():
     model_admin.__class__.__bases__ += (CustomAdminMedia,)
+
+
+@admin.register(DocumentExpiryRule)
+class DocumentExpiryRuleAdmin(admin.ModelAdmin):
+    form = DocumentExpiryRuleForm
+    list_display = ("country_group", "event_type", "document_type", "min_expiry_date")
+    list_filter = ("country_group", "event_type", "document_type")
+    search_fields = ("country_group", "event_type", "document_type")
+    ordering = ("country_group", "event_type", "document_type")
+
+    class Media:
+        js = ("js/admin_document_rule_filter.js",)   # file path inside static/
 
 @admin.register(FunctionCode)
 class FunctionCodeAdmin(admin.ModelAdmin):

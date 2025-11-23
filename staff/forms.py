@@ -1,10 +1,49 @@
 # staff/forms.py
 from django import forms
-from .models import StaffMember, Venue, FunctionCode, DocumentTypeRestriction, Document, Nationality
+from .models import StaffMember, Venue, FunctionCode, DocumentTypeRestriction, Document, Nationality, DocumentExpiryRule
 from django.core.exceptions import ValidationError
 from django.utils.translation import gettext_lazy as _
 from accounts.models import DisabledVenueSupplier
+from datetime import date
 
+class DocumentExpiryRuleForm(forms.ModelForm):
+    class Meta:
+        model = DocumentExpiryRule
+        fields = "__all__"
+
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+
+        country_group = None
+
+        # Editing an existing object → read the value
+        if self.instance and self.instance.pk:
+            country_group = self.instance.country_group
+        else:
+            # Creating → read from POST (if present)
+            country_group = self.data.get("country_group")
+
+        # Apply filtering
+        if country_group == "NON_EU":
+            self.fields["document_type"].choices = [
+                ("passport", "Passport")
+            ]
+        else:
+            # Default (EU or empty): keep both choices
+            self.fields["document_type"].choices = [
+                ("id_card", "Identity Card"),
+                ("passport", "Passport"),
+            ]
+
+    def clean(self):
+        cleaned = super().clean()
+        country_group = cleaned.get("country_group")
+        doc_type = cleaned.get("document_type")
+
+        if country_group == "NON_EU" and doc_type != "passport":
+            raise forms.ValidationError("Non-EU nationalities may only use Passport.")
+        
+        return cleaned
 
 class DocumentTypeRestrictionAdminForm(forms.ModelForm):
     class Meta:
@@ -157,6 +196,66 @@ class StaffMemberForm(forms.ModelForm):
 
         if nationality_id:
             self.apply_doc_rules(nationality_id, all_docs)
+
+    def clean(self):
+        cleaned = super().clean()
+
+        nationality = cleaned.get("nationality")
+        document_type = cleaned.get("document_type")
+        expiry = cleaned.get("document_expiry")
+        req_oly = cleaned.get("olympic_request")
+        req_par = cleaned.get("paralympic_request")
+
+        if not nationality or not document_type or not expiry:
+            return cleaned
+
+        # 1️⃣ Determine EU vs NON-EU
+        restriction = DocumentTypeRestriction.objects.filter(nationality=nationality).first()
+        is_eu = restriction.allow_identity_card if restriction else False
+        country_group = "EU" if is_eu else "NON_EU"
+
+        # 2️⃣ Map document type to internal code
+        doc_type_key = (
+            "passport" if "passport" in document_type.type_name.lower()
+            else "id_card"
+        )
+
+        # 3️⃣ Determine which event applies
+        event_type = "PAR" if req_par else "OLY" if req_oly else None
+
+        if event_type is None:
+            return cleaned  # no event selected → skip check
+
+        # 4️⃣ Fetch required rule from DB
+        rule = DocumentExpiryRule.objects.filter(
+            country_group=country_group,
+            event_type=event_type,
+            document_type=doc_type_key,
+        ).first()
+
+        if not rule:
+            # self.add_error("document_expiry",
+            #    f"Nessuna regola trovata per la combinazione nazionale/documento/evento.")
+            raise forms.ValidationError(
+                "Nessuna regola trovata per la combinazione nazionale/documento/evento."
+            )
+
+        # 5️⃣ Apply expiry validation
+        if expiry < rule.min_expiry_date:
+            self.add_error("document_expiry",
+               f"La data di scadenza del documento non può essere anteriore al {rule.min_expiry_date.strftime('%d %B %Y')}.")
+            # raise forms.ValidationError(
+            #     f"La data di scadenza del documento non può essere "
+            #     f"anteriore al {rule.min_expiry_date.strftime('%d %B %Y')}."
+            # )
+
+        # 6️⃣ Disable ID card for NON-EU
+        if country_group == "NON_EU" and doc_type_key == "id_card":
+            raise forms.ValidationError(
+                "Solo il passaporto è accettato per questa nazionalità."
+            )
+
+        return cleaned
 
     def apply_doc_rules(self, nationality_id, all_docs):
         """Apply passport-only restriction based on nationality rules."""

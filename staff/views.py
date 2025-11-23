@@ -3,7 +3,7 @@ from django.shortcuts import redirect, get_object_or_404
 from django.urls import reverse_lazy
 from django.contrib.auth.mixins import LoginRequiredMixin
 from django.db import transaction
-from .models import StaffMember, Status, ExportLog, Document, DocumentTypeRestriction
+from .models import StaffMember, Status, ExportLog, Document, DocumentTypeRestriction, DocumentExpiryRule
 
 # from accounts.models import Supplier
 from .forms import StaffMemberForm
@@ -20,6 +20,19 @@ from django.conf import settings
 import os
 from django.core.files.storage import default_storage
 
+
+def admin_document_type_filter(request):
+    group = request.GET.get("group")
+
+    if group == "NON_EU":
+        options = [{"id": "passport", "name": "Passport"}]
+    else:
+        options = [
+            {"id": "id_card", "name": "Identity Card"},
+            {"id": "passport", "name": "Passport"},
+        ]
+
+    return JsonResponse({"options": options})
 
 def check_document_rules_all(request):
     docs = Document.objects.all()

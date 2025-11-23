@@ -226,3 +226,31 @@ class ExportLog(models.Model):
 
     def __str__(self):
         return f"{self.file_name} ({self.record_count} records)  - {self.exported_at.strftime('%Y-%m-%d %H:%M:%S')}"
+
+
+class DocumentExpiryRule(models.Model):
+    COUNTRY_GROUP_CHOICES = [
+        ("EU", "EU Nationality"),
+        ("NON_EU", "Non-EU Nationality"),
+    ]
+
+    EVENT_CHOICES = [
+        ("OLY", "Olympics"),
+        ("PAR", "Paralympics"),
+    ]
+
+    DOC_TYPE_CHOICES = [
+        ("passport", "Passport"),
+        ("id_card", "Identity Card"),
+    ]
+
+    country_group = models.CharField(max_length=10, choices=COUNTRY_GROUP_CHOICES)
+    event_type = models.CharField(max_length=5, choices=EVENT_CHOICES)
+    document_type = models.CharField(max_length=20, choices=DOC_TYPE_CHOICES)
+    min_expiry_date = models.DateField()
+
+    class Meta:
+        unique_together = ("country_group", "event_type", "document_type")
+
+    def __str__(self):
+        return f"{self.country_group} - {self.event_type} - {self.document_type}"
