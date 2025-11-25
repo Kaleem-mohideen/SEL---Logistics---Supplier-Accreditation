@@ -54,9 +54,9 @@ document.addEventListener("DOMContentLoaded", function () {
             const file = this.files[0];
             if (!file) return;
 
-            const maxSize = 600 * 1024 * 1024; // 600 MB limit
+            const maxSize = 3 * 1024 * 1024; // 3 MB limit
             if (file.size > maxSize) {
-                alert("❌ File size exceeds 600MB limit!");
+                alert("❌ File size exceeds 3MB limit!");
                 this.value = "";
                 return;
             }

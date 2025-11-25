@@ -141,10 +141,10 @@ document.addEventListener("DOMContentLoaded", function () {
         return;
       }
 
-      // size check 600MB
-      const max = 600 * 1024 * 1024;
+      // size check 3MB
+      const max = 3 * 1024 * 1024;
       if (f.size > max) {
-        alert("File exceeds 600MB limit.");
+        alert("File exceeds 3MB limit.");
         e.target.value = "";
         return;
       }
