@@ -106,13 +106,13 @@ class StaffMember(models.Model):
     registration_group = models.CharField(max_length=50, default="OCOG - NATIONAL PARTNER OPERATIONS STAFF (1PP)")
     discipline = models.CharField(max_length=50, default="", blank=True)
     organisation_reference_number = models.CharField(max_length=70, default="", blank=True)
-    unknown_given_name = models.CharField(max_length=25, default="NO")
-    unknown_family_name = models.CharField(max_length=25, default="NO")
+    unknown_given_name = models.CharField(max_length=25, default="No")
+    unknown_family_name = models.CharField(max_length=25, default="No")
     preferred_given_name = models.CharField(max_length=25, blank=True)
     preferred_family_name = models.CharField(max_length=25, blank=True)
     unknown_date_of_birth = models.CharField(max_length=50, default="Date of birth is correct")
-    wheelchair_user = models.CharField(max_length=10, default="NO")
-    transferable_wheelchair_user = models.CharField(max_length=10, default="NO")
+    wheelchair_user = models.CharField(max_length=10, default="No")
+    transferable_wheelchair_user = models.CharField(max_length=10, default="No")
 
     # Checkbox fields
     olympic_request = models.BooleanField(default=False)
