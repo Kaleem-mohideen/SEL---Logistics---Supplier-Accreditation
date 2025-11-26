@@ -20,6 +20,9 @@ from django.conf import settings
 import os
 from django.core.files.storage import default_storage
 
+import openpyxl
+from openpyxl.utils import get_column_letter
+
 
 def admin_document_type_filter(request):
     group = request.GET.get("group")
@@ -77,8 +80,134 @@ def export_staff(request):
     export_path = Path(settings.MEDIA_ROOT) / "exports" / filename
     return FileResponse(open(export_path, "rb"), as_attachment=True, filename=filename)
 
+
+
 @staff_member_required
 def export_reg_excel(request):
+    """Exports REG Excel using template.xlsx and exact FORM 5 ordering."""
+
+    staff = StaffMember.objects.filter(status__status_id="1").select_related(
+        "supplier",
+        "function_code",
+        "gender",
+        "nationality",
+        "document_type",
+        "country_issuing_document",
+        "country_of_birth",
+        "place_or_city_of_birth",
+    ).prefetch_related("venue")
+
+    if not staff.exists():
+        messages.warning(request, "No completed (status=1) records available for export.")
+        return redirect("admin:staff_staffmember_changelist")
+
+    # --- Load Excel Template ---
+    # template_path = BASE_DIR / "templates" / "export" / "template.xlsx"
+    template_path = settings.BASE_DIR / "templates/export/template.xlsx"
+
+    if not template_path.exists():
+        return HttpResponse("❌ template.xlsx missing in /templates/export/", status=500)
+
+    wb = openpyxl.load_workbook(template_path)
+    ws = wb.active
+
+    # --- Define EXACT COLUMN ORDER per FORM 5 Row 4 ---
+    COLUMNS = [
+        "Request for Olympic Winter Games Accreditation",
+        "Request for Paralympic Winter Games Accreditation",
+        "Organisation",
+        "Registration Group",
+        "Function code",
+        "Venue(s)",
+        "Discipline(s)",
+        "Organisation reference number",
+        "Given name",
+        "Unknown Given name",
+        "Document Middle name",
+        "Document Family name",
+        "Unknown Family name",
+        "Preferred Given name",
+        "Preferred Family name",
+        "Date of birth",
+        "Unknown Date of birth",
+        "Gender",
+        "Nationality",
+        "Document type",
+        "Document Number",
+        "Document Expiry Date",
+        "Country issuing document",
+        "Country or Territory of birth",
+        "Place or City of birth",
+        "Email address",
+        "Photograph",
+        "Wheelchair user",
+        "Transferable wheelchair user",
+    ]
+
+    # Start writing data after header row
+    row = 4
+
+    for s in staff:
+        row_data = [
+            "Yes" if s.olympic_request else "No",
+            "Yes" if s.paralympic_request else "No",
+            s.organisation,
+            s.registration_group,
+            s.function_code.code if s.function_code else "",
+            ",".join(v.code for v in s.venue.all()) or "",
+            "",  # discipline always empty
+            s.organisation_reference_number or "",
+            s.document_given_name,
+            s.unknown_given_name,  # ALWAYS "NO"
+            s.document_middle_name or "",
+            s.document_family_name,
+            s.unknown_family_name,  # ALWAYS "NO"
+            s.preferred_given_name,
+            s.preferred_family_name,
+            s.date_of_birth.strftime("%d.%m.%Y"),
+            s.unknown_date_of_birth,  # ALWAYS “Date of birth is correct”
+            s.gender.code if s.gender else "",
+            s.nationality.code if s.nationality else "",
+            s.document_type.type_name if s.document_type else "",
+            s.document_number,
+            s.document_expiry.strftime("%d.%m.%Y") if s.document_expiry else "",
+            s.country_issuing_document.code if s.country_issuing_document else "",
+            s.country_of_birth.code if s.country_of_birth else "",
+            s.place_or_city_of_birth.city_name if s.place_or_city_of_birth else "",
+            s.email_address,
+            s.photograph.name.split("/")[-1] if s.photograph else "",
+            s.wheelchair_user,
+            s.transferable_wheelchair_user,
+        ]
+
+        # Insert row values in correct order
+        for col_index, value in enumerate(row_data, start=1):
+            ws.cell(row=row, column=col_index).value = value
+
+        row += 1
+
+    # Prepare response
+    timestamp = now().strftime("%Y%m%d_%H%M")
+    filename = f"Plog_{timestamp}.xlsx"
+
+    response = HttpResponse(
+        content_type="application/vnd.openxmlformats-officedocument.spreadsheetml.sheet"
+    )
+    response["Content-Disposition"] = f'attachment; filename="{filename}"'
+
+    wb.save(response)
+
+    # Log export
+    ExportLog.objects.create(
+        exported_by=request.user,
+        file_name=filename,
+        record_count=staff.count(),
+    )
+
+    return response
+
+@staff_member_required
+def export_reg_excel1(request):
     staff = StaffMember.objects.filter(status__status_id=1)
 
     # Convert to Excel column order EXACTLY as provided
