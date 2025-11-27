@@ -13,6 +13,7 @@ from .models import (
     StaffMember,
     ExportLog,
     DocumentExpiryRule,
+    ExportTracker,
 )
 from django.utils.html import format_html
 from django.urls import reverse
@@ -22,7 +23,7 @@ from django.http import JsonResponse
 from django.urls import path
 from accounts.models import Supplier
 from .forms import DocumentTypeRestrictionAdminForm, DocumentExpiryRuleForm
-
+# from django.db.models import Max
 
 def get_function_code(request, supplier_code):
     """Return supplier's assigned function_code for admin auto-fill"""
@@ -213,6 +214,35 @@ class StaffMemberAdmin(admin.ModelAdmin):
 
     change_list_template = "admin/staff/staffmember/change_list.html"
 
+    def export_counts_view(self, request):
+        # Count categories
+        completed = StaffMember.objects.filter(status__status_id="1")
+        not_completed = StaffMember.objects.exclude(status__status_id="1")
+        all_records = StaffMember.objects.all()
+
+        # Trackers:
+        trackers = {
+            "completed": ExportTracker.objects.get_or_create(key="completed")[0],
+            "not_completed": ExportTracker.objects.get_or_create(key="not_completed")[0],
+            "all": ExportTracker.objects.get_or_create(key="all")[0],
+        }
+
+        def new_count(qs, key):
+            return qs.filter(pk__gt=trackers[key].last_exported_pk).count()
+
+        data = {
+            "completed_total": completed.count(),
+            "completed_new": new_count(completed, "completed"),
+
+            "not_completed_total": not_completed.count(),
+            "not_completed_new": new_count(not_completed, "not_completed"),
+
+            "all_total": all_records.count(),
+            "all_new": new_count(all_records, "all"),
+        }
+
+        return JsonResponse(data)
+            
     # def export_button(self, obj):
     #     url = reverse("staff:export_reg_excel")
     #     return format_html(f'<a class="button" href="{url}">⬇ Export Status #1</a>')
@@ -277,6 +307,7 @@ class StaffMemberAdmin(admin.ModelAdmin):
         urls = super().get_urls()
         custom_urls = [
             path("get_function_code/<str:supplier_code>/", self.admin_site.admin_view(get_function_code)),
+            path("export-counts/", self.admin_site.admin_view(self.export_counts_view), name="staff_export_counts"),
         ]
         return custom_urls + urls
 

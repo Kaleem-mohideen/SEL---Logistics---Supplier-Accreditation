@@ -227,7 +227,13 @@ class ExportLog(models.Model):
     def __str__(self):
         return f"{self.file_name} ({self.record_count} records)  - {self.exported_at.strftime('%Y-%m-%d %H:%M:%S')}"
 
+class ExportTracker(models.Model):
+    key = models.CharField(max_length=50, unique=True)  # e.g., 'completed', 'not_completed', 'all'
+    last_exported_pk = models.PositiveIntegerField(default=0)
 
+    def __str__(self):
+        return f"{self.key} → {self.last_exported_pk}"
+        
 class DocumentExpiryRule(models.Model):
     COUNTRY_GROUP_CHOICES = [
         ("EU", "EU Nationality"),

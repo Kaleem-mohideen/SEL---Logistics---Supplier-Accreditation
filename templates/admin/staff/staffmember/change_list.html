@@ -34,5 +34,81 @@
         </a>
     </li>
 
+
+    <li style="position:relative;">
+
+        <button id="flagBtn" class="button"
+            style="background:#198754;border-radius:20px;padding:6px 14px;"
+            onclick="toggleFlagMenu()">
+            🚩 Flag Export ▼
+        </button>
+
+        <ul id="flagMenu"
+            style="
+                display:none;
+                position:absolute;
+                right:0;
+                background:white;
+                padding:10px;
+                margin-top:5px;
+                list-style:none;
+                border:1px solid #ddd;
+                width:240px;
+                border-radius:6px;
+                box-shadow:0 4px 6px rgba(0,0,0,0.2);
+            ">
+            <div id="exportMenuDynamic">
+                <!-- Populated by AJAX -->
+                Loading...
+            </div>
+        </ul>
+    </li>
+
+    <script>
+    function toggleFlagMenu() {
+        var menu = document.getElementById("flagMenu");
+        menu.style.display = (menu.style.display === "block") ? "none" : "block";
+    }
+
+    // Load counts dynamically
+    document.addEventListener("DOMContentLoaded", function() {
+        fetch("{% url 'admin:staff_export_counts' %}")
+            .then(r => r.json())
+            .then(d => {
+                document.getElementById("exportMenuDynamic").innerHTML = `
+                    <b>Completed (${d.completed_total})</b><br>
+                    <a ${d.completed_new == 0 ? 'style="pointer-events:none;opacity:0.4;"' : ''} 
+                    href="{% url 'staff:admin_export_flagged' 'completed' 'new' %}">
+                        • New only (${d.completed_new})
+                    </a><br>
+                    <a href="{% url 'staff:admin_export_flagged' 'completed' 'all' %}">
+                        • All records (${d.completed_total})
+                    </a>
+                    <hr>
+
+                    <b>Not Completed (${d.not_completed_total})</b><br>
+                    <a ${d.not_completed_new == 0 ? 'style="pointer-events:none;opacity:0.4;"' : ''} 
+                    href="{% url 'staff:admin_export_flagged' 'not_completed' 'new' %}">
+                        • New only (${d.not_completed_new})
+                    </a><br>
+                    <a href="{% url 'staff:admin_export_flagged' 'not_completed' 'all' %}">
+                        • All records (${d.not_completed_total})
+                    </a>
+                    <hr>
+
+                    <b>All (${d.all_total})</b><br>
+                    <a ${d.all_new == 0 ? 'style="pointer-events:none;opacity:0.4;"' : ''} 
+                    href="{% url 'staff:admin_export_flagged' 'all' 'new' %}">
+                        • New only (${d.all_new})
+                    </a><br>
+                    <a href="{% url 'staff:admin_export_flagged' 'all' 'all' %}">
+                        • All records (${d.all_total})
+                    </a>
+                `;
+            });
+    });
+    </script>
+
+
     {{ block.super }}
 {% endblock %}
