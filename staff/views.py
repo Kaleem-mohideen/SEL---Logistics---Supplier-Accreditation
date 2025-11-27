@@ -23,6 +23,41 @@ from django.core.files.storage import default_storage
 import openpyxl
 from openpyxl.utils import get_column_letter
 
+import io
+import zipfile
+from django.conf import settings
+
+
+@staff_member_required
+def download_all_photos(request):
+    """Download all files inside MEDIA_ROOT/photos/ as a single ZIP."""
+
+    photos_dir = os.path.join(settings.MEDIA_ROOT, "photos")
+
+    if not os.path.isdir(photos_dir):
+        return HttpResponse("❌ photos directory does not exist.", status=404)
+
+    buffer = io.BytesIO()
+
+    # Create ZIP in memory
+    with zipfile.ZipFile(buffer, "w", zipfile.ZIP_DEFLATED) as zipf:
+        for file_name in os.listdir(photos_dir):
+            file_path = os.path.join(photos_dir, file_name)
+
+            if os.path.isfile(file_path):
+                # add photo to ZIP with filename only (not full path)
+                zipf.write(file_path, arcname=file_name)
+
+    buffer.seek(0)
+
+    response = HttpResponse(
+        buffer,
+        content_type="application/zip"
+    )
+    response["Content-Disposition"] = 'attachment; filename="all_photos.zip"'
+
+    return response
+
 
 def admin_document_type_filter(request):
     group = request.GET.get("group")
@@ -203,56 +238,6 @@ def export_reg_excel(request):
         file_name=filename,
         record_count=staff.count(),
     )
-
-    return response
-
-@staff_member_required
-def export_reg_excel1(request):
-    staff = StaffMember.objects.filter(status__status_id=1)
-
-    # Convert to Excel column order EXACTLY as provided
-    df = pd.DataFrame([{
-        "Request for Olympic Winter Games Accreditation": "Yes" if s.olympic_request else "No",
-        "Request for Paralympic Winter Games Accreditation": "Yes" if s.paralympic_request else "No",
-        "Organisation": s.supplier.name,
-        "Registration Group": "OCOG - STAFF",
-        "Function code": s.function_code.code,
-        "Venue(s)": ", ".join([v.name for v in s.venue.all()]),
-        "Discipline(s)": ", ".join([d.name for d in s.disciplines.all()]) if hasattr(s, 'disciplines') else "",
-        "Organisation reference number": getattr(s, "reference_number", "") or "",
-        "Given name": s.document_given_name,
-        "Unknown Given name": "Yes" if getattr(s, "unknown_given_name", False) else "No",
-        "Document Middle name": s.document_middle_name or "",
-        "Document Family name": s.document_family_name,
-        "Unknown Family name": "Yes" if getattr(s, "unknown_family_name", False) else "No",
-        "Preferred Given name": getattr(s, "preferred_given_name", "") or "",
-        "Preferred Family name": getattr(s, "preferred_family_name", "") or "",
-        "Date of birth": s.date_of_birth.strftime("%d.%m.%Y"),
-        "Unknown Date of birth": "Date of birth is correct",
-        "Gender": s.gender,
-        "Nationality": getattr(getattr(s, "nationality", None), "name", "") or "",
-        "Document type": s.document_type,
-        "Document Number": s.document_number,
-        "Document Expiry Date": s.document_expiry.strftime("%d.%m.%Y"),
-        "Country issuing document": getattr(getattr(s, "country_issuing_document", None), "name", "") or "",
-        "Country or Territory of birth": getattr(getattr(s, "country_of_birth", None), "name", "") or "",
-        "Place or City of birth": getattr(s, "place_or_city_of_birth", "") or "",
-        "Email address": s.email_address,
-        "Photograph": s.photograph.name.split("/")[-1] if s.photograph else "",
-        "Wheelchair user": "Yes" if getattr(s, "wheelchair_user", False) else "No",
-        "Transferable wheelchair user": "Yes" if getattr(s, "transferable_wheelchair_user", False) else "No",
-    } for s in staff])
-
-    timestamp = now().strftime("%Y%m%d_%H%M")
-    filename = f"Plog_{timestamp}.xlsx"
-
-    # Save Excel in memory (no temp file on disk)
-    response = HttpResponse(content_type="application/vnd.openxmlformats-officedocument.spreadsheetml.sheet")
-    response["Content-Disposition"] = f'attachment; filename="{filename}"'
-    df.to_excel(response, index=False)
-
-    # Store export log
-    ExportLog.objects.create(exported_by=request.user, file_name=filename)
 
     return response
 
