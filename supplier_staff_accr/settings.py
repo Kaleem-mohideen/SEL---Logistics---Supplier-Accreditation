@@ -51,7 +51,6 @@ INSTALLED_APPS = [
     'staff.apps.StaffConfig',
     'accounts.apps.AccountsConfig',
     'django_extensions',
-    'ratelimit',
 ]
 
 MIDDLEWARE = [
