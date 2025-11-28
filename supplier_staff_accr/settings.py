@@ -51,6 +51,7 @@ INSTALLED_APPS = [
     'staff.apps.StaffConfig',
     'accounts.apps.AccountsConfig',
     'django_extensions',
+    'ratelimit',
 ]
 
 MIDDLEWARE = [
@@ -155,13 +156,26 @@ AUTH_PASSWORD_VALIDATORS = [
 LANGUAGE_CODE = 'en-us'
 
 # TIME_ZONE = 'UTC'
-# settings.py
+
 TIME_ZONE = "Europe/Rome"
 
 USE_I18N = True
 
 USE_TZ = True
 
+
+# CELERY CONFIGURATION
+# CELERY_BROKER_URL = os.getenv("CELERY_BROKER_URL", "redis://localhost:6379/0")
+# CELERY_RESULT_BACKEND = CELERY_BROKER_URL
+CELERY_ACCEPT_CONTENT = ["json"]
+CELERY_TASK_SERIALIZER = "json"
+
+
+CELERY_BROKER_URL = "redis://127.0.0.1:6379/0"
+CELERY_RESULT_BACKEND = "redis://127.0.0.1:6379/1"
+
+CELERY_TASK_TRACK_STARTED = True
+CELERY_TASK_TIME_LIMIT = 35 * 60
 
 # Static files (CSS, JavaScript, Images)
 # https://docs.djangoproject.com/en/4.2/howto/static-files/

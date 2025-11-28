@@ -23,6 +23,7 @@ from django.http import JsonResponse
 from django.urls import path
 from accounts.models import Supplier
 from .forms import DocumentTypeRestrictionAdminForm, DocumentExpiryRuleForm
+from .views import admin_export_flagged, export_counts_view, admin_supplier_list
 # from django.db.models import Max
 
 def get_function_code(request, supplier_code):
@@ -307,9 +308,24 @@ class StaffMemberAdmin(admin.ModelAdmin):
         urls = super().get_urls()
         custom_urls = [
             path("get_function_code/<str:supplier_code>/", self.admin_site.admin_view(get_function_code)),
-            path("export-counts/", self.admin_site.admin_view(self.export_counts_view), name="staff_export_counts"),
+            # path("export-counts/", self.admin_site.admin_view(self.export_counts_view), name="staff_export_counts"),
+            path("export/flag/<str:status>/<str:mode>/", admin_export_flagged, name="admin_export_flagged"),
+            path("export/flag/supplier/<str:supplier_code>/<str:mode>/", admin_export_flagged, name="admin_export_flagged_supplier"),
+            path("export/counts/", export_counts_view, name="admin_export_counts"),
+            path("admin/suppliers/list/", admin_supplier_list, name="staff_supplier_list"),
         ]
         return custom_urls + urls
+
+@admin.register(ExportTracker)
+class ExportTrackerAdmin(admin.ModelAdmin):
+    list_display = ("key", "last_exported_pk", "updated_at")
+    actions = ["reset_tracker"]
+
+    def reset_tracker(self, request, queryset):
+        queryset.update(last_exported_pk=0)
+        self.message_user(request, "Selected trackers reset.")
+    reset_tracker.short_description = "Reset selected trackers to 0"
+
 
 @admin.register(ExportLog)
 class ExportLogAdmin(admin.ModelAdmin):

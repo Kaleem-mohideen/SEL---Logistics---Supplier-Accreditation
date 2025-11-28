@@ -1,19 +1,19 @@
+# staff/views.py
 from django.views.generic import ListView, CreateView, UpdateView
-from django.shortcuts import redirect, get_object_or_404
-from django.urls import reverse_lazy
+from django.shortcuts import redirect, render, get_object_or_404
+from django.urls import reverse_lazy, reverse
 from django.contrib.auth.mixins import LoginRequiredMixin
 from django.db import transaction
 from .models import StaffMember, Status, ExportLog, Document, DocumentTypeRestriction, DocumentExpiryRule, ExportTracker
 
-# from accounts.models import Supplier
+from accounts.models import Supplier
 from .forms import StaffMemberForm
 import pandas as pd
-from django.http import HttpResponse
+from django.http import HttpResponse, FileResponse, JsonResponse, Http404
 from django.utils.timezone import now
 from django.contrib.admin.views.decorators import staff_member_required
 
 from .export_utils import export_staff_data
-from django.http import FileResponse, JsonResponse
 from django.contrib import messages
 from pathlib import Path
 from django.conf import settings
@@ -25,7 +25,140 @@ from openpyxl.utils import get_column_letter
 
 import io
 import zipfile
-from django.conf import settings
+from django.db.models import Q, Max
+from .export_utils import generate_workbook_from_qs, workbook_to_http_response, make_export_zip_with_photos, log_export
+from django.utils import timezone
+
+@staff_member_required
+def admin_supplier_list(request):
+    suppliers = Supplier.objects.all().values("code", "name")
+    return JsonResponse(list(suppliers), safe=False)
+
+# ----- helper to build queryset by category and supplier key -----
+def build_base_qs(status_key, supplier_code=None):
+    if status_key == "completed":
+        qs = StaffMember.objects.filter(status__status_id="1")
+    elif status_key == "not_completed":
+        qs = StaffMember.objects.exclude(status__status_id="1")
+    else:
+        qs = StaffMember.objects.all()
+
+    if supplier_code:
+        qs = qs.filter(supplier__code=supplier_code)
+    return qs.order_by("pk")
+
+# ----- counts view used by admin dropdown (AJAX) -----
+@staff_member_required
+def export_counts_view(request):
+    completed = StaffMember.objects.filter(status__status_id="1")
+    not_completed = StaffMember.objects.exclude(status__status_id="1")
+    all_qs = StaffMember.objects.all()
+
+    def get_tracker(key):
+        t, _ = ExportTracker.objects.get_or_create(key=key)
+        return t
+
+    trackers = {
+        "completed": get_tracker("completed"),
+        "not_completed": get_tracker("not_completed"),
+        "all": get_tracker("all"),
+    }
+
+    data = {
+        "completed_total": completed.count(),
+        "completed_new": completed.filter(pk__gt=trackers["completed"].last_exported_pk).count(),
+        "not_completed_total": not_completed.count(),
+        "not_completed_new": not_completed.filter(pk__gt=trackers["not_completed"].last_exported_pk).count(),
+        "all_total": all_qs.count(),
+        "all_new": all_qs.filter(pk__gt=trackers["all"].last_exported_pk).count(),
+    }
+    return JsonResponse(data)
+
+# ----- main admin export endpoint (flagged) -----
+@staff_member_required
+def admin_export_flagged(request, status=None, mode=None, supplier_code=None, include_photos=True, async_task=False):
+    """
+    status: completed | not_completed | all
+    mode: new | all
+    supplier_code: optional supplier code string
+    include_photos: bool
+    async_task: if True, delegate to Celery
+    """
+    print('status', status)
+    print('supplier_code', supplier_code)
+    print('mode', mode)
+
+    # Case 1 — supplier export (URL: supplier/<code>/<mode>/)
+    if supplier_code and not status:
+        status = "all"  # default for supplier exports
+
+    if status not in ("completed", "not_completed", "all"):
+        return HttpResponse("Invalid status", status=400)
+    if mode not in ("new", "all"):
+        return HttpResponse("Invalid mode", status=400)
+
+    base_qs = build_base_qs(status, supplier_code=supplier_code)
+
+    # Apply 'new' logic via tracker
+    tracker_key = status if not supplier_code else f"{status}_supplier_{supplier_code}"
+    tracker_obj, _ = ExportTracker.objects.get_or_create(key=tracker_key)
+
+    if mode == "new":
+        qs = base_qs.filter(pk__gt=tracker_obj.last_exported_pk)
+    else:
+        qs = base_qs
+
+    if not qs.exists():
+        return HttpResponse("No records to export", status=404)
+
+    # Optional: If big and async requested → enqueue
+    if async_task:
+        # We'll call Celery task below; return a simple page
+        from .tasks import celery_export_task
+        job = celery_export_task.delay(list(qs.values_list("pk", flat=True)), request.user.id, include_photos)
+        return render(request, "admin/staff/async_export_started.html", {"job_id": job.id})
+
+    # Validate data before exporting
+    # Build list of invalid records (simple checks example)
+    invalid = []
+    for s in qs:
+        if not s.document_given_name or not s.document_family_name or not s.date_of_birth or not s.gender:
+            invalid.append({
+                "pk": s.pk,
+                "plog": s.plog_unique_id,
+                "reason": "Missing required fields (given/family/email)"
+            })
+
+    if invalid:
+        # render validation page with option to force-export
+        return render(request, "admin/staff/export_validation.html", {
+            "invalid": invalid,
+            "count_ok": qs.count() - len(invalid),
+            "status": status, "mode": mode, "supplier_code": supplier_code,
+        })
+
+    # Build workbook
+    wb, count = generate_workbook_from_qs(qs)
+    # If include_photos → ZIP
+    if include_photos:
+        resp = make_export_zip_with_photos(wb, qs, include_photos=True)
+        # update tracker if mode==new
+        if mode == "new":
+            tracker_obj.last_exported_pk = qs.order_by("-pk").first().pk
+            tracker_obj.save()
+        # log export
+        log_export(request.user, resp.get("Content-Disposition", ""), count, suppliers_str=(supplier_code or ""))
+        return resp
+
+    # normal excel
+    resp, filename = workbook_to_http_response(wb)
+    # update tracker if mode==new
+    if mode == "new":
+        tracker_obj.last_exported_pk = qs.order_by("-pk").first().pk
+        tracker_obj.save()
+    # log export
+    log_export(request.user, filename, count, suppliers_str=(supplier_code or ""))
+    return resp
 
 
 VALID_STATUS = ["completed", "not_completed", "all"]
@@ -37,7 +170,7 @@ def get_tracker(key):
 
 
 @staff_member_required
-def admin_export_flagged(request, status, mode):
+def admin_export_flagged1(request, status, mode):
     """Export based on flag selection in admin."""
 
     if status not in VALID_STATUS or mode not in VALID_MODE:
@@ -187,7 +320,7 @@ def export_reg_excel_generate(qs):
             s.registration_group,
             s.function_code.code if s.function_code else "",
             ",".join(v.code for v in s.venue.all()) if s.venue.exists() else "",
-            "",  # Discipline(s) always empty
+            s.discipline,  # Discipline(s) always empty
             s.organisation_reference_number or "",
             s.document_given_name,
             s.unknown_given_name,
@@ -304,7 +437,7 @@ def export_reg_excel(request):
             s.registration_group,
             s.function_code.code if s.function_code else "",
             ",".join(v.code for v in s.venue.all()) or "",
-            "",  # discipline always empty
+            s.discipline,  # discipline always empty
             s.organisation_reference_number or "",
             s.document_given_name,
             s.unknown_given_name,  # ALWAYS "NO"

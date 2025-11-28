@@ -1,114 +1,118 @@
 {% extends "admin/change_list.html" %}
+{% load static %}
 
 {% block object-tools-items %}
-    <li>
-        <a href="{% url 'staff:download_all_photos' %}"
-           style="background:#0b5ed7;color:white;padding:4px 12px;border-radius:24px;margin-right:5px">
-            <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" fill="currentColor"
-                viewBox="0 0 16 16" style="margin-right: 6px;">
-                <path d="M.5 9.9a.5.5 0 0 1 .5.5V13a1 1 0 0 0 1 
-                         1h12a1 1 0 0 0 1-1V10.4a.5.5 0 0 1 1 
-                         0V13a2 2 0 0 1-2 2H2a2 2 0 0 1-2-2V10.4a.5.5 0 
-                         0 1 .5-.5z"/>
-                <path d="M7.646 11.854a.5.5 0 0 0 .708 0l3-3a.5.5 0 
-                         0 0-.708-.708L8.5 10.293V1.5a.5.5 0 0 0-1 
-                         0v8.793L5.354 8.146a.5.5 0 1 0-.708.708l3 
-                         3z"/>
-            </svg>
-            📦 Download All Photos (.zip)
-        </a>
-        <a href="{% url 'staff:export_reg_excel' %}" class="button export-btn">
-            <!-- SVG download icon (kept) -->
-            <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" fill="currentColor"
-                viewBox="0 0 16 16" style="margin-right: 6px;">
-                <path d="M.5 9.9a.5.5 0 0 1 .5.5V13a1 1 0 0 0 1 
-                         1h12a1 1 0 0 0 1-1V10.4a.5.5 0 0 1 1 
-                         0V13a2 2 0 0 1-2 2H2a2 2 0 0 1-2-2V10.4a.5.5 0 
-                         0 1 .5-.5z"/>
-                <path d="M7.646 11.854a.5.5 0 0 0 .708 0l3-3a.5.5 0 
-                         0 0-.708-.708L8.5 10.293V1.5a.5.5 0 0 0-1 
-                         0v8.793L5.354 8.146a.5.5 0 1 0-.708.708l3 
-                         3z"/>
-            </svg>
-            Export REG Excel
-        </a>
-    </li>
+<li style="position:relative;margin-right:8px;">
+  <button id="flagBtn" class="button" style="background:#0d6efd;color:#fff;border-radius:22px;padding:6px 12px;" onclick="toggleFlagMenu()">
+    🚩 Export Options <span id="flagArrow">▼</span>
+  </button>
 
+  <div id="flagMenu" style="display:none;position:absolute;right:0;top:36px;background:#fff;border:1px solid #ddd;padding:10px;border-radius:8px;min-width:320px;box-shadow:0 6px 18px rgba(0,0,0,0.12);z-index:9999;">
+    <div id="flagMenuContent">Loading...</div>
+    <div id="flagSpinner" style="display:none;margin-top:8px;text-align:center;">
+      <span class="spinner-border spinner-border-sm" role="status" aria-hidden="true"></span> Exporting...
+    </div>
+  </div>
+</li>
 
-    <li style="position:relative;">
+{{ block.super }}
+{% endblock %}
 
-        <button id="flagBtn" class="button"
-            style="background:#198754;border-radius:20px;padding:6px 14px;"
-            onclick="toggleFlagMenu()">
-            🚩 Flag Export ▼
-        </button>
+{% block extrahead %}
+<link href="https://cdnjs.cloudflare.com/ajax/libs/tippy.js/6.3.7/tippy.css" rel="stylesheet">
+<script src="https://cdnjs.cloudflare.com/ajax/libs/tippy.js/6.3.7/tippy.umd.min.js"></script>
+{% endblock %}
 
-        <ul id="flagMenu"
-            style="
-                display:none;
-                position:absolute;
-                right:0;
-                background:white;
-                padding:10px;
-                margin-top:5px;
-                list-style:none;
-                border:1px solid #ddd;
-                width:240px;
-                border-radius:6px;
-                box-shadow:0 4px 6px rgba(0,0,0,0.2);
-            ">
-            <div id="exportMenuDynamic">
-                <!-- Populated by AJAX -->
-                Loading...
-            </div>
-        </ul>
-    </li>
+{% block footer %}
+<script>
+function toggleFlagMenu(){
+    var menu = document.getElementById("flagMenu");
+    var arrow = document.getElementById("flagArrow");
+    if(menu.style.display === "block"){ menu.style.display = "none"; arrow.textContent = "▼"; }
+    else { menu.style.display = "block"; arrow.textContent = "▲"; }
+}
 
-    <script>
-    function toggleFlagMenu() {
-        var menu = document.getElementById("flagMenu");
-        menu.style.display = (menu.style.display === "block") ? "none" : "block";
+// click outside to close
+document.addEventListener("click", function(e){
+    if(!e.target.closest("#flagMenu") && !e.target.closest("#flagBtn")){
+        document.getElementById("flagMenu").style.display = "none";
+        document.getElementById("flagArrow").textContent = "▼";
     }
+});
 
-    // Load counts dynamically
-    document.addEventListener("DOMContentLoaded", function() {
-        fetch("{% url 'admin:staff_export_counts' %}")
-            .then(r => r.json())
-            .then(d => {
-                document.getElementById("exportMenuDynamic").innerHTML = `
-                    <b>Completed (${d.completed_total})</b><br>
-                    <a ${d.completed_new == 0 ? 'style="pointer-events:none;opacity:0.4;"' : ''} 
-                    href="{% url 'staff:admin_export_flagged' 'completed' 'new' %}">
-                        • New only (${d.completed_new})
-                    </a><br>
-                    <a href="{% url 'staff:admin_export_flagged' 'completed' 'all' %}">
-                        • All records (${d.completed_total})
-                    </a>
-                    <hr>
+function disableLinkIfZero(el, count){
+    if(count === 0){
+        el.style.pointerEvents = "none";
+        el.style.opacity = 0.5;
+        el.title = "No records available";
+    }
+}
 
-                    <b>Not Completed (${d.not_completed_total})</b><br>
-                    <a ${d.not_completed_new == 0 ? 'style="pointer-events:none;opacity:0.4;"' : ''} 
-                    href="{% url 'staff:admin_export_flagged' 'not_completed' 'new' %}">
-                        • New only (${d.not_completed_new})
-                    </a><br>
-                    <a href="{% url 'staff:admin_export_flagged' 'not_completed' 'all' %}">
-                        • All records (${d.not_completed_total})
-                    </a>
-                    <hr>
+// load dynamic counts
+document.addEventListener("DOMContentLoaded", function(){
+    fetch("{% url 'admin:admin_export_counts' %}")
+    .then(r => r.json())
+    .then(d => {
+        const html = `
+        <div style="font-weight:600;margin-bottom:6px;">Completed <span style="float:right;color:green;">${d.completed_total}</span></div>
+        <a id="comp_new" href="{% url 'admin:admin_export_flagged' 'completed' 'new' %}" style="display:block;margin-bottom:4px;">• New only <span style="float:right;" class="badge badge-sm bg-primary">${d.completed_new}</span></a>
+        <a id="comp_all" href="{% url 'admin:admin_export_flagged' 'completed' 'all' %}" style="display:block;margin-bottom:8px;">• All records <span style="float:right;" class="badge badge-sm bg-info">${d.completed_total}</span></a>
+        <hr>
+        <div style="font-weight:600;margin-bottom:6px;">Not Completed <span style="float:right;color:orange;">${d.not_completed_total}</span></div>
+        <a id="not_new" href="{% url 'admin:admin_export_flagged' 'not_completed' 'new' %}" style="display:block;margin-bottom:4px;">• New only <span style="float:right;" class="badge badge-sm bg-primary">${d.not_completed_new}</span></a>
+        <a id="not_all" href="{% url 'admin:admin_export_flagged' 'not_completed' 'all' %}" style="display:block;margin-bottom:8px;">• All records <span style="float:right;" class="badge badge-sm bg-info">${d.not_completed_total}</span></a>
+        <hr>
+        <div style="font-weight:600;margin-bottom:6px;">All <span style="float:right;color:blue;">${d.all_total}</span></div>
+        <a id="all_new" href="{% url 'admin:admin_export_flagged' 'all' 'new' %}" style="display:block;margin-bottom:4px;">• New only <span style="float:right;" class="badge badge-sm bg-primary">${d.all_new}</span></a>
+        <a id="all_all" href="{% url 'admin:admin_export_flagged' 'all' 'all' %}" style="display:block;">• All records <span style="float:right;" class="badge badge-sm bg-info">${d.all_total}</span></a>
 
-                    <b>All (${d.all_total})</b><br>
-                    <a ${d.all_new == 0 ? 'style="pointer-events:none;opacity:0.4;"' : ''} 
-                    href="{% url 'staff:admin_export_flagged' 'all' 'new' %}">
-                        • New only (${d.all_new})
-                    </a><br>
-                    <a href="{% url 'staff:admin_export_flagged' 'all' 'all' %}">
-                        • All records (${d.all_total})
-                    </a>
-                `;
+        <hr>
+        <div style="margin-top:6px;">
+          <label style="font-weight:600;">Per supplier:</label>
+          <form id="supplierExportForm" method="get" action="">
+            <select id="supplierSelect" style="width:100%;margin-top:6px;" class="form-select form-select-sm">
+              <option value="">-- Select supplier (optional) --</option>
+            </select>
+            <div style="display:flex;gap:6px;margin-top:8px;">
+              <button type="button" id="supplier_new" class="btn btn-sm btn-outline-primary" style="flex:1;">New only</button>
+              <button type="button" id="supplier_all" class="btn btn-sm btn-outline-secondary" style="flex:1;">All</button>
+            </div>
+          </form>
+        </div>
+        `;
+        document.getElementById("flagMenuContent").innerHTML = html;
+
+        // disable options if counts zero
+        disableLinkIfZero(document.getElementById("comp_new"), d.completed_new);
+        disableLinkIfZero(document.getElementById("not_new"), d.not_completed_new);
+        disableLinkIfZero(document.getElementById("all_new"), d.all_new);
+
+        // fetch suppliers list
+        fetch("{% url 'admin:staff_supplier_list' %}")
+        .then(r => r.json())
+        .then(sup => {
+            const sel = document.getElementById("supplierSelect");
+            sup.forEach(s => {
+                const opt = document.createElement("option");
+                opt.value = s.code;
+                opt.textContent = `${s.code} — ${s.name}`;
+                sel.appendChild(opt);
             });
+        });
+
+        // supplier button listeners
+        document.getElementById("supplier_new").addEventListener("click", function(){
+            const sc = document.getElementById("supplierSelect").value;
+            if(!sc){ alert("Select a supplier first."); return; }
+            window.location.href = `{% url 'admin:admin_export_flagged_supplier' 'all' 'new' %}`.replace("/all/new/", `/${sc}/new/`);
+        });
+        document.getElementById("supplier_all").addEventListener("click", function(){
+            const sc = document.getElementById("supplierSelect").value;
+            if(!sc){ alert("Select a supplier first."); return; }
+            window.location.href = `{% url 'admin:admin_export_flagged_supplier' 'all' 'all' %}`.replace("/all/all/", `/${sc}/all/`);
+        });
+
     });
-    </script>
-
-
-    {{ block.super }}
+});
+</script>
 {% endblock %}

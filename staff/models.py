@@ -1,3 +1,4 @@
+# staff/models.py
 from django.db import models
 from django.conf import settings
 from accounts.models import Supplier
@@ -218,22 +219,7 @@ class StaffMember(models.Model):
     def __str__(self):
         return f"{self.document_family_name} {self.document_given_name} ({self.plog_unique_id})"
 
-class ExportLog(models.Model):
-    file_name = models.CharField(max_length=255)
-    exported_at = models.DateTimeField(auto_now_add=True)
-    record_count = models.PositiveIntegerField(default=0)
-    exported_by = models.ForeignKey(settings.AUTH_USER_MODEL, null=True, blank=True, on_delete=models.SET_NULL)
 
-    def __str__(self):
-        return f"{self.file_name} ({self.record_count} records)  - {self.exported_at.strftime('%Y-%m-%d %H:%M:%S')}"
-
-class ExportTracker(models.Model):
-    key = models.CharField(max_length=50, unique=True)  # e.g., 'completed', 'not_completed', 'all'
-    last_exported_pk = models.PositiveIntegerField(default=0)
-
-    def __str__(self):
-        return f"{self.key} → {self.last_exported_pk}"
-        
 class DocumentExpiryRule(models.Model):
     COUNTRY_GROUP_CHOICES = [
         ("EU", "EU Nationality"),
@@ -260,3 +246,33 @@ class DocumentExpiryRule(models.Model):
 
     def __str__(self):
         return f"{self.country_group} - {self.event_type} - {self.document_type}"
+
+class ExportTracker(models.Model):
+    """
+    Track last exported PK per category and per supplier.
+    Key examples:
+      - completed                (global)
+      - completed_supplier_{id}  (per supplier)
+      - not_completed
+      - all
+      - all_supplier_{id}
+    """
+    key = models.CharField(max_length=100, unique=True)
+    last_exported_pk = models.PositiveIntegerField(default=0)
+    updated_at = models.DateTimeField(auto_now=True)
+
+    def __str__(self):
+        return f"{self.key} -> {self.last_exported_pk}"
+
+
+class ExportLog(models.Model):
+    exported_by = models.ForeignKey(settings.AUTH_USER_MODEL, null=True, on_delete=models.SET_NULL)
+    file_name = models.CharField(max_length=255)
+    record_count = models.PositiveIntegerField(default=0)
+    suppliers = models.TextField(blank=True)  # comma separated supplier codes (optional)
+    exported_at = models.DateTimeField(auto_now_add=True)
+    done = models.BooleanField(default=True)
+    notes = models.TextField(blank=True)
+
+    def __str__(self):
+        return f"{self.file_name} ({self.record_count} records)  - {self.exported_at.strftime('%Y-%m-%d %H:%M:%S')}"        
