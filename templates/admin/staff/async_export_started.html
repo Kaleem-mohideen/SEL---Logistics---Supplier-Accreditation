@@ -1,0 +1,34 @@
+{% extends "admin/base_site.html" %}
+
+{% block content %}
+<div style="max-width:600px;margin:20px auto;font-size:15px;line-height:1.6;">
+    
+    <h2>⏳ Export Started</h2>
+
+    <p>Your export request has been queued and is now processing in the background.</p>
+
+    <div style="
+        background: #f8f9fa;
+        padding: 15px 20px;
+        border-radius: 8px;
+        border: 1px solid #ddd;
+        margin-top: 15px;
+    ">
+        <p style="margin:0;">
+            <strong>Job ID:</strong> {{ job_id }}
+        </p>
+        <p style="margin:4px 0 0 0;">
+            The system will notify you by email when your export is ready.
+        </p>
+    </div>
+
+    <div style="margin-top:25px;">
+        <a href="{% url 'admin:staff_staffmember_changelist' %}" 
+            class="button" 
+            style="background:#0d6efd;color:white;">
+            Back to Staff List
+        </a>
+    </div>
+
+</div>
+{% endblock %}

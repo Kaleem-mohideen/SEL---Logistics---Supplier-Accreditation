@@ -1,0 +1,19 @@
+{% extends "admin/base_site.html" %}
+{% block content %}
+  <h2>Export Validation</h2>
+  <p>Found {{ invalid|length }} invalid records. You can review them below or click "Force Export" to export anyway.</p>
+
+  <table class="table">
+    <thead><tr><th>PK</th><th>PLOG</th><th>Reason</th></tr></thead>
+    <tbody>
+      {% for item in invalid %}
+      <tr><td>{{ item.pk }}</td><td>{{ item.plog }}</td><td>{{ item.reason }}</td></tr>
+      {% endfor %}
+    </tbody>
+  </table>
+
+  <div style="margin-top:16px;">
+    <a class="button" href="{{ request.META.HTTP_REFERER }}">Back</a>
+    <a class="button" href="{% url 'admin:admin_export_flagged' status mode %}?force=1">Force Export</a>
+  </div>
+{% endblock %}
