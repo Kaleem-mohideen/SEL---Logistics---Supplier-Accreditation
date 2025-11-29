@@ -84,10 +84,6 @@ def admin_export_flagged(request, status=None, mode=None, supplier_code=None, in
     include_photos: bool
     async_task: if True, delegate to Celery
     """
-    print('status', status)
-    print('supplier_code', supplier_code)
-    print('mode', mode)
-
     # Case 1 — supplier export (URL: supplier/<code>/<mode>/)
     if supplier_code and not status:
         status = "all"  # default for supplier exports
@@ -109,7 +105,8 @@ def admin_export_flagged(request, status=None, mode=None, supplier_code=None, in
         qs = base_qs
 
     if not qs.exists():
-        return HttpResponse("No records to export", status=404)
+        return JsonResponse({"error": "No records to export"}, status=400)
+        # return HttpResponse("No records to export", status=404)
 
     # Optional: If big and async requested → enqueue
     if async_task:
@@ -141,7 +138,7 @@ def admin_export_flagged(request, status=None, mode=None, supplier_code=None, in
     wb, count = generate_workbook_from_qs(qs)
     # If include_photos → ZIP
     if include_photos:
-        resp = make_export_zip_with_photos(wb, qs, include_photos=True)
+        resp, saved_filename = make_export_zip_with_photos(wb, qs, include_photos=True)
         # update tracker if mode==new
         if mode == "new":
             tracker_obj.last_exported_pk = qs.order_by("-pk").first().pk
@@ -159,54 +156,6 @@ def admin_export_flagged(request, status=None, mode=None, supplier_code=None, in
     # log export
     log_export(request.user, filename, count, suppliers_str=(supplier_code or ""))
     return resp
-
-
-VALID_STATUS = ["completed", "not_completed", "all"]
-VALID_MODE = ["new", "all"]
-
-def get_tracker(key):
-    obj, created = ExportTracker.objects.get_or_create(key=key)
-    return obj
-
-
-@staff_member_required
-def admin_export_flagged1(request, status, mode):
-    """Export based on flag selection in admin."""
-
-    if status not in VALID_STATUS or mode not in VALID_MODE:
-        return HttpResponse("Invalid export filter.", status=400)
-
-    # Map status → queryset filter
-    if status == "completed":
-        base_qs = StaffMember.objects.filter(status__status_id="1")
-    elif status == "not_completed":
-        base_qs = StaffMember.objects.exclude(status__status_id="1")
-    else:
-        base_qs = StaffMember.objects.all()
-
-    tracker = get_tracker(status)
-
-    # MODE: new (only records > last_exported_pk)
-    if mode == "new":
-        qs = base_qs.filter(pk__gt=tracker.last_exported_pk)
-    else:
-        qs = base_qs
-
-    # No records?
-    if not qs.exists():
-        return HttpResponse("No matching records for export.", status=404)
-
-    # Do your export
-    # Replace this with your template export function
-    response = export_reg_excel_generate(qs)  # ← we create this below
-
-    # Update tracker only if mode=new
-    if mode == "new":
-        max_pk = qs.order_by("-pk").first().pk
-        tracker.last_exported_pk = max_pk
-        tracker.save()
-
-    return response
 
 
 @staff_member_required
@@ -296,197 +245,6 @@ def export_staff(request):
     export_path = Path(settings.MEDIA_ROOT) / "exports" / filename
     return FileResponse(open(export_path, "rb"), as_attachment=True, filename=filename)
 
-
-def export_reg_excel_generate(qs):
-    """
-    Generates Excel using template.xlsx and places records starting from row 4,
-    following EXACT FORMAT of Download File Structure – FORM 5.
-    """
-
-    template_path = settings.BASE_DIR / "templates/export/template.xlsx"
-    if not template_path.exists():
-        raise FileNotFoundError("template.xlsx missing in templates/export/")
-
-    wb = openpyxl.load_workbook(template_path)
-    ws = wb.active
-
-    row = 4  # Data always starts at row 4 in FORM 5
-
-    for s in qs:
-        row_data = [
-            "Yes" if s.olympic_request else "No",
-            "Yes" if s.paralympic_request else "No",
-            s.organisation,
-            s.registration_group,
-            s.function_code.code if s.function_code else "",
-            ",".join(v.code for v in s.venue.all()) if s.venue.exists() else "",
-            s.discipline,  # Discipline(s) always empty
-            s.organisation_reference_number or "",
-            s.document_given_name,
-            s.unknown_given_name,
-            s.document_middle_name or "",
-            s.document_family_name,
-            s.unknown_family_name,
-            s.preferred_given_name,
-            s.preferred_family_name,
-            s.date_of_birth.strftime("%d.%m.%Y") if s.date_of_birth else "",
-            s.unknown_date_of_birth,
-            s.gender.code if s.gender else "",
-            s.nationality.code if s.nationality else "",
-            s.document_type.type_name if s.document_type else "",
-            s.document_number,
-            s.document_expiry.strftime("%d.%m.%Y") if s.document_expiry else "",
-            s.country_issuing_document.code if s.country_issuing_document else "",
-            s.country_of_birth.code if s.country_of_birth else "",
-            s.place_or_city_of_birth.city_name if s.place_or_city_of_birth else "",
-            s.email_address,
-            s.photograph.name.split("/")[-1] if s.photograph else "",
-            s.wheelchair_user,
-            s.transferable_wheelchair_user,
-        ]
-
-        for col_index, value in enumerate(row_data, start=1):
-            ws.cell(row=row, column=col_index).value = value
-
-        row += 1
-
-    # Create downloadable output response
-    output = HttpResponse(
-        content_type="application/vnd.openxmlformats-officedocument.spreadsheetml.sheet"
-    )
-
-    timestamp = now().strftime("%Y%m%d_%H%M")
-    filename = f"Plog_{timestamp}.xlsx"
-    output["Content-Disposition"] = f'attachment; filename="{filename}"'
-
-    wb.save(output)
-
-    return output
-
-
-@staff_member_required
-def export_reg_excel(request):
-    """Exports REG Excel using template.xlsx and exact FORM 5 ordering."""
-
-    staff = StaffMember.objects.filter(status__status_id="1").select_related(
-        "supplier",
-        "function_code",
-        "gender",
-        "nationality",
-        "document_type",
-        "country_issuing_document",
-        "country_of_birth",
-        "place_or_city_of_birth",
-    ).prefetch_related("venue")
-
-    if not staff.exists():
-        messages.warning(request, "No completed (status=1) records available for export.")
-        return redirect("admin:staff_staffmember_changelist")
-
-    # --- Load Excel Template ---
-    # template_path = BASE_DIR / "templates" / "export" / "template.xlsx"
-    template_path = settings.BASE_DIR / "templates/export/template.xlsx"
-
-    if not template_path.exists():
-        return HttpResponse("❌ template.xlsx missing in /templates/export/", status=500)
-
-    wb = openpyxl.load_workbook(template_path)
-    ws = wb.active
-
-    # --- Define EXACT COLUMN ORDER per FORM 5 Row 4 ---
-    COLUMNS = [
-        "Request for Olympic Winter Games Accreditation",
-        "Request for Paralympic Winter Games Accreditation",
-        "Organisation",
-        "Registration Group",
-        "Function code",
-        "Venue(s)",
-        "Discipline(s)",
-        "Organisation reference number",
-        "Given name",
-        "Unknown Given name",
-        "Document Middle name",
-        "Document Family name",
-        "Unknown Family name",
-        "Preferred Given name",
-        "Preferred Family name",
-        "Date of birth",
-        "Unknown Date of birth",
-        "Gender",
-        "Nationality",
-        "Document type",
-        "Document Number",
-        "Document Expiry Date",
-        "Country issuing document",
-        "Country or Territory of birth",
-        "Place or City of birth",
-        "Email address",
-        "Photograph",
-        "Wheelchair user",
-        "Transferable wheelchair user",
-    ]
-
-    # Start writing data after header row
-    row = 4
-
-    for s in staff:
-        row_data = [
-            "Yes" if s.olympic_request else "No",
-            "Yes" if s.paralympic_request else "No",
-            s.organisation,
-            s.registration_group,
-            s.function_code.code if s.function_code else "",
-            ",".join(v.code for v in s.venue.all()) or "",
-            s.discipline,  # discipline always empty
-            s.organisation_reference_number or "",
-            s.document_given_name,
-            s.unknown_given_name,  # ALWAYS "NO"
-            s.document_middle_name or "",
-            s.document_family_name,
-            s.unknown_family_name,  # ALWAYS "NO"
-            s.preferred_given_name,
-            s.preferred_family_name,
-            s.date_of_birth.strftime("%d.%m.%Y"),
-            s.unknown_date_of_birth,  # ALWAYS “Date of birth is correct”
-            s.gender.code if s.gender else "",
-            s.nationality.code if s.nationality else "",
-            s.document_type.type_name if s.document_type else "",
-            s.document_number,
-            s.document_expiry.strftime("%d.%m.%Y") if s.document_expiry else "",
-            s.country_issuing_document.code if s.country_issuing_document else "",
-            s.country_of_birth.code if s.country_of_birth else "",
-            s.place_or_city_of_birth.city_name if s.place_or_city_of_birth else "",
-            s.email_address,
-            s.photograph.name.split("/")[-1] if s.photograph else "",
-            s.wheelchair_user,
-            s.transferable_wheelchair_user,
-        ]
-
-        # Insert row values in correct order
-        for col_index, value in enumerate(row_data, start=1):
-            ws.cell(row=row, column=col_index).value = value
-
-        row += 1
-
-    # Prepare response
-    timestamp = now().strftime("%Y%m%d_%H%M")
-    filename = f"Plog_{timestamp}.xlsx"
-
-    response = HttpResponse(
-        content_type="application/vnd.openxmlformats-officedocument.spreadsheetml.sheet"
-    )
-    response["Content-Disposition"] = f'attachment; filename="{filename}"'
-
-    wb.save(response)
-
-    # Log export
-    ExportLog.objects.create(
-        exported_by=request.user,
-        file_name=filename,
-        record_count=staff.count(),
-    )
-
-    return response
 
 class SupplierSecureMixin(LoginRequiredMixin):
     """Ensures user has a supplier before accessing staff"""

@@ -27,11 +27,11 @@ def celery_export_task(self, pks, user_id, include_photos=False):
     wb, count = generate_workbook_from_qs(qs)
     # create zip if photos included
     if include_photos:
-        resp = make_export_zip_with_photos(wb, qs, include_photos=True)
+        resp, saved_filename = make_export_zip_with_photos(wb, qs, include_photos=True)
         # since this runs inside celery, we should save the zip to disk and store path in ExportLog
         export_dir = Path(settings.MEDIA_ROOT) / "exports"
         export_dir.mkdir(exist_ok=True)
-        filename = f"Plog_{timezone.now().strftime('%Y%m%d_%H%M')}.zip"
+        filename = f"Plog_{timezone.now().strftime('%Y%m%d_%H%M%S')}.zip"
         with open(export_dir / filename, "wb") as f:
             f.write(resp.content)
         ExportLog.objects.create(exported_by=user, file_name=filename, record_count=count, notes="async zip")

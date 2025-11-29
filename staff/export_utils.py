@@ -2,13 +2,27 @@ import openpyxl
 from pathlib import Path
 from django.conf import settings
 from django.utils.timezone import now
-from .models import StaffMember, ExportLog
+from .models import StaffMember, ExportLog, ExportedZipFile
 import os
 import io
 import zipfile
 from django.http import HttpResponse
 from django.utils import timezone
 from openpyxl.styles import Font, Alignment
+
+def save_zip_to_media(zip_bytes, prefix="Plog"):
+    """Save ZIP bytes to MEDIA_ROOT/exports/ and return filename."""
+    export_dir = Path(settings.MEDIA_ROOT) / "exports"
+    export_dir.mkdir(exist_ok=True)
+
+    filename = f"{prefix}_{timezone.now().strftime('%Y%m%d_%H%M%S')}.zip"
+    filepath = export_dir / filename
+
+    with open(filepath, "wb") as f:
+        f.write(zip_bytes)
+
+    ExportedZipFile.objects.create(filename=filename)
+    return filename
 
 def safe(value):
     return value if value else ""
@@ -33,7 +47,7 @@ def export_staff_data(user):
             "country_issuing_document",
             "country_of_birth",
             "place_or_city_of_birth"
-        ).prefetch_related("venue")
+        ).prefetch_related("venue").filter(supplier__code=user.supplier.code).order_by("pk")
 
     if not queryset.exists():
         return None, "NO_RECORDS"
@@ -153,19 +167,6 @@ def export_staff_data(user):
 
     return filename, "OK"
 
-# staff/export_utils.py
-
-
-def safe_get(obj, path, default=""):
-    try:
-        for p in path.split("."):
-            obj = getattr(obj, p)
-            if obj is None:
-                return default
-        return obj or default
-    except Exception:
-        return default
-
 def generate_workbook_from_qs(qs, template_relative="templates/export/template.xlsx"):
     """
     Build an openpyxl workbook using the template and the queryset.
@@ -215,17 +216,6 @@ def generate_workbook_from_qs(qs, template_relative="templates/export/template.x
             ws.cell(row=start_row, column=col_index).value = val
         start_row += 1
         
-    # # in export_utils.py, after building ws rows, add:
-    # summary_ws = wb.create_sheet(title="Export Summary", index=0)
-    # summary_ws["A1"] = "Export date"
-    # summary_ws["B1"] = timezone.now().strftime("%Y-%m-%d %H:%M")
-    # summary_ws["A2"] = "Exported by"
-    # summary_ws["B2"] = getattr(user, "username", "") if user else ""
-    # summary_ws["A3"] = "Record count"
-    # summary_ws["B3"] = qs.count()
-    # # you can add more meta details...
-
-
     return wb, qs.count()
 
 def workbook_to_http_response(wb, filename_prefix="Plog"):
@@ -240,38 +230,49 @@ def workbook_to_http_response(wb, filename_prefix="Plog"):
 
 def make_export_zip_with_photos(wb, qs, include_photos=True, filename_prefix="Plog"):
     """
-    Return an HttpResponse with a zip that contains:
-      - the Excel file (in-memory)
-      - photos (if include_photos)
+    Creates ZIP with Excel + photos.
+    - Saves ZIP to MEDIA_ROOT/exports/
+    - Returns HttpResponse for download
+    - Also returns saved filename for logging
     """
-    # Excel to bytes
+    # 1) Convert Excel workbook to bytes
     excel_bytes = io.BytesIO()
     wb.save(excel_bytes)
     excel_bytes.seek(0)
 
+    # 2) Build ZIP in memory
     zip_buffer = io.BytesIO()
     with zipfile.ZipFile(zip_buffer, "w", zipfile.ZIP_DEFLATED) as zf:
-        # Add excel
+
+        # Excel name inside ZIP
         excel_name = f"{filename_prefix}_{timezone.now().strftime('%Y%m%d_%H%M%S')}.xlsx"
         zf.writestr(excel_name, excel_bytes.read())
 
+        # Photos
         if include_photos:
             photos_dir = Path(settings.MEDIA_ROOT) / "photos"
             if photos_dir.exists():
-                print("photo dir exists")
                 for s in qs:
-                    print("photo dir exists")
                     if s.photograph:
                         fname = Path(s.photograph.name).name
                         file_path = photos_dir / fname
-                        print("s", file_path)
                         if file_path.exists():
                             zf.write(file_path, arcname=f"photos/{fname}")
 
+    # Prepare ZIP bytes
     zip_buffer.seek(0)
+    zip_bytes = zip_buffer.getvalue()
+
+    # 3) SAVE ZIP TO MEDIA_ROOT/exports/
+    saved_filename = save_zip_to_media(zip_bytes, prefix=filename_prefix)
+
+    # 4) Also return as HttpResponse for browser download
     response = HttpResponse(zip_buffer, content_type="application/zip")
-    response["Content-Disposition"] = f'attachment; filename="{filename_prefix}_{timezone.now().strftime("%Y%m%d_%H%M%S")}.zip"'
-    return response
+    response["Content-Disposition"] = f'attachment; filename="{saved_filename}"'
+    
+
+    return response, saved_filename
+
 
 def log_export(user, filename, record_count, suppliers_str="", notes=""):
     ExportLog.objects.create(

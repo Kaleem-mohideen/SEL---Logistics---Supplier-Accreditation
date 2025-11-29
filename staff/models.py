@@ -2,6 +2,7 @@
 from django.db import models
 from django.conf import settings
 from accounts.models import Supplier
+from pathlib import Path
 
 # from .models_lookup import (
 #     FunctionCode, Venue, Gender, Nationality, Document,
@@ -276,3 +277,26 @@ class ExportLog(models.Model):
 
     def __str__(self):
         return f"{self.file_name} ({self.record_count} records)  - {self.exported_at.strftime('%Y-%m-%d %H:%M:%S')}"        
+
+
+
+class ExportedZipFile(models.Model):
+    """
+    Tracks all generated ZIP or XLSX files saved in MEDIA_ROOT/exports/.
+    """
+    filename = models.CharField(max_length=255, unique=True)
+    created_at = models.DateTimeField(auto_now_add=True)
+
+    @property
+    def path(self):
+        return Path(settings.MEDIA_ROOT) / "exports" / self.filename
+
+    @property
+    def size_mb(self):
+        try:
+            return round(self.path.stat().st_size / (1024*1024), 2)
+        except FileNotFoundError:
+            return 0
+
+    def __str__(self):
+        return self.filename
