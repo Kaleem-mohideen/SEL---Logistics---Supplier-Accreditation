@@ -153,7 +153,7 @@ def export_staff_data(user):
     export_dir = Path(settings.MEDIA_ROOT) / "exports"
     export_dir.mkdir(exist_ok=True)
 
-    timestamp = now().strftime("%Y%m%d_%H%M")
+    timestamp = now().strftime("%Y%m%d_%H%M%S")
     filename = f"Plog_{timestamp}.xlsx"
     output_path = export_dir / filename
 
@@ -219,7 +219,7 @@ def generate_workbook_from_qs(qs, template_relative="templates/export/template.x
     return wb, qs.count()
 
 def workbook_to_http_response(wb, filename_prefix="Plog"):
-    timestamp = timezone.now().strftime("%Y%m%d_%H%M")
+    timestamp = timezone.now().strftime("%Y%m%d_%H%M%S")
     filename = f"{filename_prefix}_{timestamp}.xlsx"
     response = HttpResponse(
         content_type="application/vnd.openxmlformats-officedocument.spreadsheetml.sheet"

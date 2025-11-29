@@ -43,7 +43,7 @@ def celery_export_task(self, pks, user_id, include_photos=False):
         # save excel to file and store
         export_dir = Path(settings.MEDIA_ROOT) / "exports"
         export_dir.mkdir(exist_ok=True)
-        filename = f"Plog_{timezone.now().strftime('%Y%m%d_%H%M')}.xlsx"
+        filename = f"Plog_{timezone.now().strftime('%Y%m%d_%H%M%S')}.xlsx"
         with open(export_dir / filename, "wb") as f:
             wb.save(f)
         ExportLog.objects.create(exported_by=user, file_name=filename, record_count=count, notes="async excel")

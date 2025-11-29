@@ -186,7 +186,6 @@ class StaffMemberForm(forms.ModelForm):
         # - POST submission
         # - GET initial load
         nationality_id = None
-        print("self.instance.nationality_id", self.instance.nationality_id)
         if self.instance and self.instance.pk and self.instance.nationality_id:
             nationality_id = self.instance.nationality_id
         elif "nationality" in self.data:

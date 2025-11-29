@@ -207,7 +207,6 @@ class StaffMember(models.Model):
         if not self.plog_unique_id:
             count = StaffMember.objects.filter(supplier=self.supplier).count() + 1
             user_code = f"{count:02}"
-            print("****",f"{self.supplier.code}{user_code}")
             self.plog_unique_id = f"{self.supplier.code}{user_code}"
         # Auto-fill fixed fields based on the rules
         if not self.preferred_given_name:

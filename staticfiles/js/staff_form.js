@@ -35,7 +35,6 @@ document.addEventListener("DOMContentLoaded", function () {
     // Disable Place of Birth when not Italy
   $("#id_country_of_birth").on("change", function () {
     const selected = $("#id_country_of_birth option:selected").text().trim().toLowerCase();
-    console.log(selected);
     const placeField = $("#id_place_or_city_of_birth");
     if (selected === "italy" || selected === "italia") {
       placeField.prop("disabled", false);
@@ -48,7 +47,6 @@ document.addEventListener("DOMContentLoaded", function () {
       3) AJAX: Document Type Rules based on Nationality
   --------------------------------------------------- */
   $("#id_nationality").on("change", function () {
-    console.log(here in nation);
     let nationalityId = $(this).val();
 
     if (!nationalityId) return;
