@@ -246,7 +246,7 @@ class StaffMemberAdmin(admin.ModelAdmin):
     )
 
     readonly_fields = (
-        "plog_unique_id",
+        
         "created_at",
     )
 
