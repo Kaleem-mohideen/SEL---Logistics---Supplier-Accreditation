@@ -206,26 +206,26 @@ class StaffMember(models.Model):
     def save(self, *args, **kwargs):
         # Assign PLOG UNIQUE ID = SupplierCode + progressive count
         if not self.plog_unique_id:
-            last = (
-                StaffMember.objects.filter(supplier=self.supplier)
-                .order_by("-plog_unique_id")
-                .first()
-            )
+            # last = (
+            #     StaffMember.objects.filter(supplier=self.supplier)
+            #     .order_by("-plog_unique_id")
+            #     .first()
+            # )
 
-            if last:
-                try:
-                    last_num = int(last.plog_unique_id.replace(self.supplier.code, ""))
-                except:
-                    last_num = 0
-            else:
-                last_num = 0
+            # if last:
+            #     try:
+            #         last_num = int(last.plog_unique_id.replace(self.supplier.code, ""))
+            #     except:
+            #         last_num = 0
+            # else:
+            #     last_num = 0
 
-            new_num = last_num + 1
-            self.plog_unique_id = f"{self.supplier.code}{new_num:02d}"
+            # new_num = last_num + 1
+            # self.plog_unique_id = f"{self.supplier.code}{new_num:02d}"
 
-            # count = StaffMember.objects.filter(supplier=self.supplier).count() + 1
-            # user_code = f"{count:02}"
-            # self.plog_unique_id = f"{self.supplier.code}{user_code}"
+            count = StaffMember.objects.filter(supplier=self.supplier).count() + 1
+            user_code = f"{count:02}"
+            self.plog_unique_id = f"{self.supplier.code}{user_code}"
             
         # Auto-fill fixed fields based on the rules
         if not self.preferred_given_name:
