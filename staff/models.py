@@ -141,7 +141,7 @@ class StaffMember(models.Model):
     photograph = models.ImageField(upload_to="photos/")
 
     # System-generated identifiers
-    plog_unique_id = models.CharField(max_length=80, editable=False, unique=True)
+    plog_unique_id = models.CharField(max_length=80, editable=True, unique=True)
     # elearning_id = models.CharField(max_length=8, blank=True, null=True)
     worker_unique_id = models.CharField(max_length=80, unique=True, blank=True, null=True)
     # reg_id = models.CharField(max_length=20, blank=True, null=True)
