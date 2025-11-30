@@ -1,5 +1,5 @@
 # staff/models.py
-from django.db import models
+from django.db import models, transaction
 from django.conf import settings
 from accounts.models import Supplier
 from pathlib import Path
@@ -141,7 +141,7 @@ class StaffMember(models.Model):
     photograph = models.ImageField(upload_to="photos/")
 
     # System-generated identifiers
-    plog_unique_id = models.CharField(max_length=80, editable=False)
+    plog_unique_id = models.CharField(max_length=80, editable=False, unique=True)
     # elearning_id = models.CharField(max_length=8, blank=True, null=True)
     worker_unique_id = models.CharField(max_length=80, unique=True, blank=True, null=True)
     # reg_id = models.CharField(max_length=20, blank=True, null=True)
@@ -202,12 +202,31 @@ class StaffMember(models.Model):
         self.status = status_obj
         return self.status
 
+    @transaction.atomic
     def save(self, *args, **kwargs):
         # Assign PLOG UNIQUE ID = SupplierCode + progressive count
         if not self.plog_unique_id:
-            count = StaffMember.objects.filter(supplier=self.supplier).count() + 1
-            user_code = f"{count:02}"
-            self.plog_unique_id = f"{self.supplier.code}{user_code}"
+            last = (
+                StaffMember.objects.filter(supplier=self.supplier)
+                .order_by("-plog_unique_id")
+                .first()
+            )
+
+            if last:
+                try:
+                    last_num = int(last.plog_unique_id.replace(self.supplier.code, ""))
+                except:
+                    last_num = 0
+            else:
+                last_num = 0
+
+            new_num = last_num + 1
+            self.plog_unique_id = f"{self.supplier.code}{new_num:02d}"
+
+            # count = StaffMember.objects.filter(supplier=self.supplier).count() + 1
+            # user_code = f"{count:02}"
+            # self.plog_unique_id = f"{self.supplier.code}{user_code}"
+            
         # Auto-fill fixed fields based on the rules
         if not self.preferred_given_name:
             self.preferred_given_name = self.document_given_name

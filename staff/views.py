@@ -123,7 +123,7 @@ def admin_export_flagged(request, status=None, mode=None, supplier_code=None, in
             invalid.append({
                 "pk": s.pk,
                 "plog": s.plog_unique_id,
-                "reason": "Missing required fields (given/family/email)"
+                "reason": "Missing required fields (given/family/date_of_birth/gender)"
             })
 
     if invalid:
