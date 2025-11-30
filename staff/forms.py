@@ -88,7 +88,7 @@ class StaffMemberForm(forms.ModelForm):
 
     class Meta:
         model = StaffMember
-        exclude = ("supplier", "plog_unique_id", "created_at", "organisation", "registration_group", "unknown_given_name", "unknown_family_name", "unknown_date_of_birth", "wheelchair_user", "transferable_wheelchair_user")
+        exclude = ("supplier", "created_at", "organisation", "registration_group", "unknown_given_name", "unknown_family_name", "unknown_date_of_birth", "wheelchair_user", "transferable_wheelchair_user")
 
         widgets = {
             "olympic_request": forms.CheckboxInput(attrs={"class": "form-check-input"}),
