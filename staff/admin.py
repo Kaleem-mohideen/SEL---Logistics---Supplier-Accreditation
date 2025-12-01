@@ -218,7 +218,8 @@ class StaffMemberAdminForm(forms.ModelForm):
 class StaffMemberAdmin(admin.ModelAdmin):
     form = StaffMemberAdminForm
     list_display = (
-        "plog_unique_id",
+        "pk_link",
+        "plog_unique_id_clickable",
         "document_family_name",
         "document_given_name",
         "function_code",
@@ -264,6 +265,11 @@ class StaffMemberAdmin(admin.ModelAdmin):
             readonly.append("user")
         return readonly
 
+    @admin.display(description="PLOG ID", ordering="plog_unique_id")
+    def plog_unique_id_clickable(self, obj):
+        url = reverse("admin:staff_staffmember_change", args=[obj.pk])
+        return format_html('<a href="{}">{}</a>', url, obj.plog_unique_id)
+
     @admin.display(description="Status")
     def colored_status(self, obj):
         color = obj.status_color()
@@ -272,7 +278,11 @@ class StaffMemberAdmin(admin.ModelAdmin):
             color,
             obj.status.label,
         )
-        
+
+    @admin.display(ordering='pk', description="ID")
+    def pk_link(self, obj):
+        return obj.pk
+
     @admin.display(description="Registered By")
     def registered_by(self, obj):
         return obj.user.username if obj.user else "—"
