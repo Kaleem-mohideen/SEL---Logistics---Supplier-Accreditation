@@ -386,10 +386,13 @@ class StaffUpdateView(SupplierSecureMixin, UpdateView):
         instance.evaluate_completion_status()
         instance.save()
 
+        # Check what changed
+        new_file_uploaded = 'photograph' in form.changed_data
+
         # ---- Renaming logic only if a NEW file was uploaded ----
         new_file = form.cleaned_data.get("photograph")
 
-        if new_file and hasattr(new_file, "name"):
+        if new_file and new_file_uploaded and hasattr(new_file, "name"):
             # a NEW file uploaded → rename it
             try:
                 new_uploaded_path = instance.photograph.path
