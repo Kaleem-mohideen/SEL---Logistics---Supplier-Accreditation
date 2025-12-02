@@ -142,11 +142,12 @@ class StaffMember(models.Model):
 
     # System-generated identifiers
     plog_unique_id = models.CharField(max_length=80, editable=False, unique=True)
-    # elearning_id = models.CharField(max_length=8, blank=True, null=True)
     worker_unique_id = models.CharField(max_length=80, unique=True, blank=True, null=True)
-    # reg_id = models.CharField(max_length=20, blank=True, null=True)
-    # accred_id = models.CharField(max_length=20, blank=True, null=True)
-
+    elearning_id = models.CharField(max_length=8, blank=True, null=True)
+    reg_id = models.CharField(max_length=20, blank=True, null=True)
+    accred_id = models.CharField(max_length=20, blank=True, null=True)
+    jolly_01 = models.CharField(max_length=20, blank=True, null=True)
+    jolly_02 = models.CharField(max_length=20, blank=True, null=True)
 
     # Registration metadata
     created_at = models.DateTimeField(auto_now_add=True)
