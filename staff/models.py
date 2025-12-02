@@ -3,6 +3,7 @@ from django.db import models, transaction
 from django.conf import settings
 from accounts.models import Supplier
 from pathlib import Path
+from django.utils import timezone
 
 # from .models_lookup import (
 #     FunctionCode, Venue, Gender, Nationality, Document,
@@ -234,6 +235,22 @@ class StaffMember(models.Model):
         if not self.preferred_family_name:
             self.preferred_family_name = self.document_family_name
 
+        # Object is being created for the first time
+        if not self.pk:
+            super().save(*args, **kwargs)  # save once to generate created_at
+
+            # Get created_at converted to Europe/Rome
+            local_dt = timezone.localtime(self.created_at)
+
+            # Set registration_date & registration_time from local converted time
+            self.registration_date = local_dt.date()
+            self.registration_time = local_dt.time()
+
+            # Save again to store the converted values
+            super().save(update_fields=["registration_date", "registration_time"])
+            return
+
+        # Normal update
         super().save(*args, **kwargs)
 
     def __str__(self):

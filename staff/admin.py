@@ -249,6 +249,8 @@ class StaffMemberAdmin(admin.ModelAdmin):
     readonly_fields = (
         "plog_unique_id",
         "created_at",
+        "registration_date",
+        "registration_time",
     )
 
     filter_horizontal = ("venue",)   # Better UI for ManyToMany fields
