@@ -1,4 +1,4 @@
-from django.contrib import admin
+from django.contrib import admin, messages
 from .models import (
     FunctionCode,
     Venue,
@@ -14,21 +14,19 @@ from .models import (
     ExportLog,
     DocumentExpiryRule,
     ExportTracker,
+    ExportedZipFile,
 )
 from django.utils.html import format_html
-from django.urls import reverse
+from django.urls import reverse, path
 from django import forms
 
 from django.http import JsonResponse, FileResponse, Http404
-from django.urls import path
 from accounts.models import Supplier
 from .forms import DocumentTypeRestrictionAdminForm, DocumentExpiryRuleForm
 from .views import admin_export_flagged, export_counts_view, admin_supplier_list
-# from django.db.models import Max
 from django.shortcuts import redirect
 from django.conf import settings
 from pathlib import Path
-from .models import ExportedZipFile
 
 @admin.register(ExportedZipFile)
 class ExportedZipFileAdmin(admin.ModelAdmin):
@@ -339,11 +337,18 @@ class StaffMemberAdmin(admin.ModelAdmin):
 class ExportTrackerAdmin(admin.ModelAdmin):
     list_display = ("key", "last_exported_pk", "updated_at")
     actions = ["reset_tracker"]
+    change_list_template = "admin/staff/exporttracker/change_list.html"
 
+    @admin.action(description="Reset selected trackers")
     def reset_tracker(self, request, queryset):
         queryset.update(last_exported_pk=0)
-        self.message_user(request, "Selected trackers reset.")
-    reset_tracker.short_description = "Reset selected trackers to 0"
+        self.message_user(request, "Selected trackers have been reset.", messages.SUCCESS)
+
+    @admin.action(description="Delete selected trackers")
+    def delete_tracker(self, request, queryset):
+        count = queryset.count()
+        queryset.delete()
+        self.message_user(request, f"{count} tracker(s) deleted.", messages.SUCCESS)
 
 
 @admin.register(ExportLog)

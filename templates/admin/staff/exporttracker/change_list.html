@@ -1,0 +1,61 @@
+{% extends "admin/change_list.html" %}
+{% load static %}
+
+{% block extrahead %}
+{{ block.super }}
+<script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+{% endblock %}
+
+{% block footer %}
+
+<script>
+console.log("Custom JS loaded!");
+
+document.addEventListener("DOMContentLoaded", function(){
+    console.log("DOM Loaded…");
+
+    const actionSelect = document.querySelector("select[name='action']");
+    const goButton = document.querySelector("div.actions button[name='index']");
+    const form = document.getElementById("changelist-form");
+
+    console.log("Select:", actionSelect);
+    console.log("Go button:", goButton);
+    console.log("Form:", form);
+
+    if (!actionSelect || !goButton || !form) {
+        console.log("Missing elements, exiting.");
+        return;
+    }
+
+    goButton.addEventListener("click", function(event){
+        console.log("Go button clicked!");
+
+        const action = actionSelect.value;
+        console.log("Selected Action:", action);
+
+        if (action !== "reset_tracker" && action !== "delete_tracker") {
+            console.log("Not an intercepted action → normal submit.");
+            return;
+        }
+
+        event.preventDefault();
+        console.log("Intercepted! Showing confirmation popup...");
+
+        Swal.fire({
+            title: "Confirm?",
+            text: "Are you sure?",
+            icon: "warning",
+            showCancelButton: true,
+        }).then(result => {
+            if (result.isConfirmed) {
+                console.log("User confirmed. Submitting.");
+                form.submit();
+            } else {
+                console.log("User cancelled.");
+            }
+        });
+    });
+});
+</script>
+
+{% endblock %}
