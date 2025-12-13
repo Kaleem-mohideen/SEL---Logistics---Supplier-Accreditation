@@ -291,7 +291,22 @@ class StaffCreateView(SupplierSecureMixin, CreateView):
             instance.function_code = supplier.function_code
 
         # 🔹 Generate unique IDs
-        next_num = StaffMember.objects.filter(supplier=supplier).count() + 1
+        # next_num = StaffMember.objects.filter(supplier=supplier).count() + 1
+        last = (
+            StaffMember.objects.filter(supplier=supplier)
+            .order_by("-plog_unique_id")
+            .first()
+        )
+
+        if last:
+            try:
+                last_num = int(last.plog_unique_id.replace(supplier.code, ""))
+            except:
+                last_num = 0
+        else:
+            last_num = 0
+
+        next_num = last_num + 1
         instance.plog_unique_id = f"{supplier.code}{next_num:02d}"
         # instance.worker_unique_id = f"{supplier.code}-{next_num:03d}"
 
