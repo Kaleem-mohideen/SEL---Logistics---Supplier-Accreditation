@@ -26,7 +26,7 @@ from openpyxl.utils import get_column_letter
 import io
 import zipfile
 from django.db.models import Q, Max
-from .export_utils import generate_workbook_from_qs, workbook_to_http_response, make_export_zip_with_photos, log_export
+from .export_utils import generate_workbook_from_qs, workbook_to_http_response, make_export_zip_with_photos, log_export, build_export_filename
 from django.utils import timezone
 
 @staff_member_required
@@ -136,9 +136,15 @@ def admin_export_flagged(request, status=None, mode=None, supplier_code=None, in
 
     # Build workbook
     wb, count = generate_workbook_from_qs(qs)
+    
+    # Build filename according to rules
+    final_filename = build_export_filename(status, mode, supplier_code, ext="zip")
+
     # If include_photos → ZIP
     if include_photos:
-        resp, saved_filename = make_export_zip_with_photos(wb, qs, include_photos=True)
+        # resp, saved_filename = make_export_zip_with_photos(wb, qs, include_photos=True)
+        resp, saved_filename = make_export_zip_with_photos(wb, qs, include_photos=True, export_filename=final_filename)
+
         # update tracker if mode==new
         if mode == "new":
             tracker_obj.last_exported_pk = qs.order_by("-pk").first().pk

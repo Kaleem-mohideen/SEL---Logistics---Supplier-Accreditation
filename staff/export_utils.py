@@ -10,19 +10,32 @@ from django.http import HttpResponse
 from django.utils import timezone
 from openpyxl.styles import Font, Alignment
 
-def save_zip_to_media(zip_bytes, prefix="Plog"):
+def build_export_filename(status, mode, supplier_code=None, ext="zip"):
+    status_map = {
+        "completed": "c",
+        "not_completed": "nc",
+        "all": "all",
+    }
+    s = status_map.get(status, "all")
+    timestamp = timezone.now().strftime("%Y%m%d_%H%M%S")
+
+    if supplier_code:
+        return f"{supplier_code}_{s}_{mode}_{timestamp}.{ext}"
+
+    return f"{s}_{mode}_{timestamp}.{ext}"
+
+def save_zip_to_media(zip_bytes, filename):
     """Save ZIP bytes to MEDIA_ROOT/exports/ and return filename."""
     export_dir = Path(settings.MEDIA_ROOT) / "exports"
     export_dir.mkdir(exist_ok=True)
 
-    filename = f"{prefix}_{timezone.now().strftime('%Y%m%d_%H%M%S')}.zip"
     filepath = export_dir / filename
-
     with open(filepath, "wb") as f:
         f.write(zip_bytes)
 
     ExportedZipFile.objects.create(filename=filename)
     return filename
+
 
 def safe(value):
     return value if value else ""
@@ -228,7 +241,8 @@ def workbook_to_http_response(wb, filename_prefix="Plog"):
     wb.save(response)
     return response, filename
 
-def make_export_zip_with_photos(wb, qs, include_photos=True, filename_prefix="Plog"):
+def make_export_zip_with_photos(wb, qs, include_photos=True, export_filename="Plog"):
+
     """
     Creates ZIP with Excel + photos.
     - Saves ZIP to MEDIA_ROOT/exports/
@@ -245,7 +259,7 @@ def make_export_zip_with_photos(wb, qs, include_photos=True, filename_prefix="Pl
     with zipfile.ZipFile(zip_buffer, "w", zipfile.ZIP_DEFLATED) as zf:
 
         # Excel name inside ZIP
-        excel_name = f"{filename_prefix}_{timezone.now().strftime('%Y%m%d_%H%M%S')}.xlsx"
+        excel_name = f"{export_filename}_{timezone.now().strftime('%Y%m%d_%H%M%S')}.xlsx"
         zf.writestr(excel_name, excel_bytes.read())
 
         # Photos
@@ -264,7 +278,11 @@ def make_export_zip_with_photos(wb, qs, include_photos=True, filename_prefix="Pl
     zip_bytes = zip_buffer.getvalue()
 
     # 3) SAVE ZIP TO MEDIA_ROOT/exports/
-    saved_filename = save_zip_to_media(zip_bytes, prefix=filename_prefix)
+    # Use custom filename or fallback
+    if not export_filename:
+        export_filename = f"Plog_{timezone.now().strftime('%Y%m%d_%H%M%S')}.zip"
+
+    saved_filename = save_zip_to_media(zip_bytes, filename=export_filename)
 
     # 4) Also return as HttpResponse for browser download
     response = HttpResponse(zip_buffer, content_type="application/zip")
