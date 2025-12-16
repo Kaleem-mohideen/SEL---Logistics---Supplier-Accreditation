@@ -23,7 +23,7 @@ from django import forms
 from django.http import JsonResponse, FileResponse, Http404
 from accounts.models import Supplier
 from .forms import DocumentTypeRestrictionAdminForm, DocumentExpiryRuleForm
-from .views import admin_export_flagged, export_counts_view, admin_supplier_list
+from .views import admin_export_flagged, export_counts_view, admin_supplier_list, admin_export_full_zip
 from django.shortcuts import redirect
 from django.conf import settings
 from pathlib import Path
@@ -328,6 +328,7 @@ class StaffMemberAdmin(admin.ModelAdmin):
             path("get_function_code/<str:supplier_code>/", self.admin_site.admin_view(get_function_code)),
             path("export/flag/<str:status>/<str:mode>/", admin_export_flagged, name="admin_export_flagged"),
             path("export/flag/supplier/<str:supplier_code>/<str:mode>/", admin_export_flagged, name="admin_export_flagged_supplier"),
+            path("export/full/zip/", admin_export_full_zip, name="admin_export_full_zip",),
             path("export/counts/", export_counts_view, name="admin_export_counts"),
             path("admin/suppliers/list/", admin_supplier_list, name="staff_supplier_list"),
         ]

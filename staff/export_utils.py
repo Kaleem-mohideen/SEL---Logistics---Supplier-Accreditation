@@ -10,6 +10,108 @@ from django.http import HttpResponse
 from django.utils import timezone
 from openpyxl.styles import Font, Alignment
 
+def generate_full_workbook_from_qs(qs, template_relative="templates/export/template.xlsx"):
+    """
+    Build an openpyxl workbook using the template and the queryset.
+    FULL EXPORT: base FORM-5 columns + all extra StaffMember columns appended.
+    Extra column headers are written ONLY once in row 3.
+    Returns (wb, record_count).
+    """
+    template_path = settings.BASE_DIR / template_relative
+    if not template_path.exists():
+        raise FileNotFoundError(f"Missing template at {template_path}")
+
+    wb = openpyxl.load_workbook(template_path)
+    ws = wb.active
+
+    DATA_START_ROW = 4
+    HEADER_ROW = 3
+
+    # --- EXTRA COLUMN HEADERS (AFTER Transferable wheelchair user) ---
+    extra_headers = [
+        "PLOG Unique ID",
+        "Worker Unique ID",
+        "Elearning ID",
+        "REG ID",
+        "Accred ID",
+        "Jolly 01",
+        "Jolly 02",
+        "Supplier Code",
+        "Status",
+        "Registration User",
+        "Created At",
+        "Registration Date",
+        "Registration Time",
+    ]
+
+    BASE_COL_COUNT = 29  # last base column = Transferable wheelchair user
+
+    for idx, header in enumerate(extra_headers, start=BASE_COL_COUNT + 1):
+        ws.cell(row=HEADER_ROW, column=idx).value = header
+
+    # --- DATA ROWS ---
+    row = DATA_START_ROW
+
+    for s in qs:
+        row_data = [
+            # -------- BASE FORM 5 --------
+            "Yes" if s.olympic_request else "No",
+            "Yes" if s.paralympic_request else "No",
+            s.organisation,
+            s.registration_group,
+            s.function_code.code if s.function_code else "",
+            ",".join(v.code for v in s.venue.all()) if s.venue.exists() else "",
+            s.discipline or "",
+            s.organisation_reference_number or "",
+            s.document_given_name or "",
+            s.unknown_given_name or "No",
+            s.document_middle_name or "",
+            s.document_family_name or "",
+            s.unknown_family_name or "No",
+            s.preferred_given_name or "",
+            s.preferred_family_name or "",
+            s.date_of_birth.strftime("%d.%m.%Y") if s.date_of_birth else "",
+            s.unknown_date_of_birth,
+            s.gender.code if s.gender else "",
+            s.nationality.code if s.nationality else "",
+            s.document_type.type_name if s.document_type else "",
+            s.document_number or "",
+            s.document_expiry.strftime("%d.%m.%Y") if s.document_expiry else "",
+            s.country_issuing_document.code if s.country_issuing_document else "",
+            s.country_of_birth.code if s.country_of_birth else "",
+            s.place_or_city_of_birth.city_name
+                if getattr(s.country_of_birth, "code", "") == "ITA" and s.place_or_city_of_birth
+                else "",
+            s.email_address or "",
+            s.photograph.name.split("/")[-1] if s.photograph else "",
+            s.wheelchair_user or "No",
+            s.transferable_wheelchair_user or "No",
+
+            # -------- EXTRA COLUMNS --------
+            s.plog_unique_id,
+            s.worker_unique_id or "",
+            s.elearning_id or "",
+            s.reg_id or "",
+            s.accred_id or "",
+            s.jolly_01 or "",
+            s.jolly_02 or "",
+            s.supplier.code if s.supplier else "",
+            s.status.label if s.status else "",
+            s.user.username if s.user else "",
+            s.created_at.astimezone(timezone.get_current_timezone()).strftime("%d.%m.%Y %H:%M:%S")
+                if s.created_at else "",
+            s.registration_date.strftime("%d.%m.%Y") if s.registration_date else "",
+            s.registration_time.strftime("%H:%M:%S") if s.registration_time else "",
+        ]
+
+        for col_index, val in enumerate(row_data, start=1):
+            ws.cell(row=row, column=col_index).value = val
+
+        row += 1
+
+    return wb, qs.count()
+
+
 def build_export_filename(status, mode, supplier_code=None, ext="zip"):
     status_map = {
         "completed": "c",

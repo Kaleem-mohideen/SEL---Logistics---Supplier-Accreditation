@@ -26,8 +26,41 @@ from openpyxl.utils import get_column_letter
 import io
 import zipfile
 from django.db.models import Q, Max
-from .export_utils import generate_workbook_from_qs, workbook_to_http_response, make_export_zip_with_photos, log_export, build_export_filename
+from .export_utils import generate_workbook_from_qs, workbook_to_http_response, make_export_zip_with_photos, log_export, build_export_filename, generate_full_workbook_from_qs
 from django.utils import timezone
+
+
+@staff_member_required
+def admin_export_full_zip(request):
+    """
+    FULL export:
+    - All StaffMember columns
+    - All photos
+    - ZIP download
+    """
+    qs = StaffMember.objects.all().order_by("pk")
+
+    if not qs.exists():
+        return JsonResponse({"error": "No records found"}, status=400)
+
+    wb, count = generate_full_workbook_from_qs(qs)
+    timestamp = timezone.now().strftime("%Y%m%d_%H%M%S")
+    response, filename = make_export_zip_with_photos(
+        wb,
+        qs,
+        include_photos=True,
+        export_filename=f"FULL_STAFF_EXPORT_{timestamp}.zip",
+    )
+
+    # Optional logging
+    log_export(
+        user=request.user,
+        filename=filename,
+        record_count=count,
+        suppliers_str="ALL",
+    )
+
+    return response
 
 @staff_member_required
 def admin_supplier_list(request):
