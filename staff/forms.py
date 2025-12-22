@@ -5,6 +5,7 @@ from django.core.exceptions import ValidationError
 from django.utils.translation import gettext_lazy as _
 from accounts.models import DisabledVenueSupplier
 from datetime import date
+import json
 
 class DocumentExpiryRuleForm(forms.ModelForm):
     class Meta:
@@ -124,7 +125,13 @@ class StaffMemberForm(forms.ModelForm):
             "country_issuing_document": forms.Select(attrs={"class": "form-select"}),
             "country_of_birth": forms.Select(attrs={"class": "form-select", "id": "id_country_of_birth"}),
             "place_or_city_of_birth": forms.Select(attrs={"class": "form-select", "id": "id_place_or_city_of_birth"}),
-
+            # ✅ NEW FIELD (readonly, same styling)
+            "place_of_birth_country_code": forms.TextInput(attrs={
+                "class": "form-control mt-1",
+                "id": "place_country_code_display",
+                "readonly": "readonly",
+                "style": "display:none;background:#f8f9fa;",
+            }),
             "email_address": forms.EmailInput(attrs={"class": "form-control"}),
 
             "photograph": forms.ClearableFileInput(attrs={"class": "form-control", "accept": "image/jpeg,image/png"}),
@@ -137,6 +144,18 @@ class StaffMemberForm(forms.ModelForm):
     def __init__(self, *args, **kwargs):
         supplier = kwargs.pop("supplier", None)
         super().__init__(*args, **kwargs)
+
+        field = self.fields.get("country_of_birth")
+        if not field:
+            return
+
+        codes_map = {
+            str(c.pk): c.code
+            for c in field.queryset
+        }
+
+        # ✅ MUST be JSON string
+        field.widget.attrs["data-codes"] = json.dumps(codes_map)
 
         for f in ["olympic_request", "paralympic_request"]:
             self.fields[f].widget.attrs.update({"class": "form-check-input"})
@@ -204,6 +223,8 @@ class StaffMemberForm(forms.ModelForm):
         expiry = cleaned.get("document_expiry")
         req_oly = cleaned.get("olympic_request")
         req_par = cleaned.get("paralympic_request")
+        country = cleaned.get("country_of_birth")
+        city = cleaned.get("place_or_city_of_birth")        
 
         if not nationality or not document_type or not expiry:
             return cleaned
@@ -253,6 +274,20 @@ class StaffMemberForm(forms.ModelForm):
             raise forms.ValidationError(
                 "Solo il passaporto è accettato per questa nazionalità."
             )
+
+        if not country:
+            return cleaned
+
+        if country.code == "ITA":
+            if not city:
+                raise forms.ValidationError(
+                    "Per l'Italia è obbligatorio selezionare il luogo di nascita."
+                )
+            cleaned["place_of_birth_country_code"] = None
+        else:
+            # Non-Italy → store country code
+            cleaned["place_or_city_of_birth"] = None
+            cleaned["place_of_birth_country_code"] = country.code
 
         return cleaned
 
@@ -309,3 +344,4 @@ class StaffMemberForm(forms.ModelForm):
             if qs.exists():
                 raise ValidationError("❌ This Worker Unique ID already exists. Please use a different one.")
         return worker_id
+    

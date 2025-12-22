@@ -129,8 +129,19 @@ class StaffMember(models.Model):
     document_type = models.ForeignKey(Document, on_delete=models.SET_NULL, null=True)
     country_issuing_document = models.ForeignKey(CountryIssuingDocument, on_delete=models.SET_NULL, null=True)
     country_of_birth = models.ForeignKey(CountryOfBirth, on_delete=models.SET_NULL, null=True)
-    place_or_city_of_birth = models.ForeignKey(PlaceOrCityOfBirth, on_delete=models.SET_NULL, null=True)
+    place_or_city_of_birth = models.ForeignKey(
+        PlaceOrCityOfBirth,
+        on_delete=models.SET_NULL,
+        null=True,
+        blank=True
+    )
 
+    place_of_birth_country_code = models.CharField(
+        max_length=10,
+        blank=True,
+        null=True,
+        help_text="Used when Country of Birth is not Italy (stores ISO country code)"
+    )
     # Free-text / date fields
     document_given_name = models.CharField(max_length=25)
     document_middle_name = models.CharField(max_length=25, blank=True)

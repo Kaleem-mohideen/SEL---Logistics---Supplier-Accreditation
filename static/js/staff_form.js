@@ -31,18 +31,32 @@ document.addEventListener("DOMContentLoaded", function () {
   /* ---------------------------------------------------
       2) Disable Place of Birth unless Italy
   --------------------------------------------------- */
-  
-    // Disable Place of Birth when not Italy
+  /* ---------------------------------------------------
+   Place of Birth logic
+--------------------------------------------------- */
+
   $("#id_country_of_birth").on("change", function () {
-    const selected = $("#id_country_of_birth option:selected").text().trim().toLowerCase();
-    console.log(selected);
-    const placeField = $("#id_place_or_city_of_birth");
-    if (selected === "italy" || selected === "italia") {
-      placeField.prop("disabled", false);
-    } else {
-      placeField.val("").trigger("change").prop("disabled", true);
-    }
+
+      const select = $(this);
+      const selectedPk = select.val();
+      const codesMap = select.data("codes") || {};
+      const countryCode = codesMap[selectedPk];
+
+      const placeSelect = $("#id_place_or_city_of_birth");
+      const placeText = $("#place_country_code_display");
+
+      if (countryCode === "ITA") {
+          // 🇮🇹 Italy → city dropdown enabled
+          placeSelect.prop("disabled", false).show();
+          placeText.hide().val("");
+      } else if (countryCode) {
+          // 🌍 Non-Italy → show country code
+          placeSelect.prop("disabled", true).val("").hide();
+          placeText.val(countryCode).show();
+      }
   }).trigger("change");
+
+
 
     /* ---------------------------------------------------
       3) AJAX: Document Type Rules based on Nationality

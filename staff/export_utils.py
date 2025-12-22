@@ -81,7 +81,7 @@ def generate_full_workbook_from_qs(qs, template_relative="templates/export/templ
             s.country_of_birth.code if s.country_of_birth else "",
             s.place_or_city_of_birth.city_name
                 if getattr(s.country_of_birth, "code", "") == "ITA" and s.place_or_city_of_birth
-                else "",
+                else s.place_of_birth_country_code,
             s.email_address or "",
             s.photograph.name.split("/")[-1] if s.photograph else "",
             s.wheelchair_user or "No",
@@ -162,6 +162,7 @@ def export_staff_data(user):
             "country_issuing_document",
             "country_of_birth",
             "place_or_city_of_birth"
+            "place_of_birth_country_code"
         ).prefetch_related("venue").filter(supplier__code=user.supplier.code).order_by("pk")
 
     if not queryset.exists():
@@ -246,7 +247,7 @@ def export_staff_data(user):
         if getattr(s.country_of_birth, "code", "") == "ITA":
             ws.cell(row=row, column=25).value = safe(getattr(s.place_or_city_of_birth, "city_name", ""))
         else:
-            ws.cell(row=row, column=25).value = ""
+            ws.cell(row=row, column=25).value = s.place_of_birth_country_code
 
         # Email
         ws.cell(row=row, column=26).value = s.email_address
@@ -321,7 +322,7 @@ def generate_workbook_from_qs(qs, template_relative="templates/export/template.x
             s.document_expiry.strftime("%d.%m.%Y") if getattr(s, "document_expiry", None) else "",
             s.country_issuing_document.code if s.country_issuing_document else "",
             s.country_of_birth.code if s.country_of_birth else "",
-            s.place_or_city_of_birth.city_name if getattr(s.country_of_birth, "code", "") == "ITA" and s.place_or_city_of_birth else "",
+            s.place_or_city_of_birth.city_name if getattr(s.country_of_birth, "code", "") == "ITA" and s.place_or_city_of_birth else s.place_of_birth_country_code,
             s.email_address or "",
             s.photograph.name.split("/")[-1] if getattr(s, "photograph", None) else "",
             s.wheelchair_user or "No",
