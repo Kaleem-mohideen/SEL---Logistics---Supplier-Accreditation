@@ -4,6 +4,7 @@ from django.conf import settings
 from accounts.models import Supplier
 from pathlib import Path
 from django.utils import timezone
+from django.db.models import Max
 
 # from .models_lookup import (
 #     FunctionCode, Venue, Gender, Nationality, Document,
@@ -218,23 +219,38 @@ class StaffMember(models.Model):
     @transaction.atomic
     def save(self, *args, **kwargs):
         # Assign PLOG UNIQUE ID = SupplierCode + progressive count
-        if not self.plog_unique_id:
-            last = (
-                StaffMember.objects.filter(supplier=self.supplier)
-                .order_by("-plog_unique_id")
-                .first()
+        if not self.pk and not self.plog_unique_id:
+            # lock rows for this supplier to avoid race conditions
+            last_num = (
+                StaffMember.objects
+                .select_for_update()
+                .filter(supplier=self.supplier, plog_unique_id__startswith=self.supplier.code)
+                .annotate(num=models.functions.Cast(
+                    models.functions.Substr("plog_unique_id", len(self.supplier.code) + 1),
+                    models.IntegerField()
+                ))
+                .aggregate(max_num=Max("num"))
+                .get("max_num") or 0
             )
 
-            if last:
-                try:
-                    last_num = int(last.plog_unique_id.replace(self.supplier.code, ""))
-                except:
-                    last_num = 0
-            else:
-                last_num = 0
+            self.plog_unique_id = f"{self.supplier.code}{last_num + 1:02d}"        
+        # if not self.plog_unique_id:
+        #     last = (
+        #         StaffMember.objects.filter(supplier=self.supplier)
+        #         .order_by("-plog_unique_id")
+        #         .first()
+        #     )
 
-            new_num = last_num + 1
-            self.plog_unique_id = f"{self.supplier.code}{new_num:02d}"
+        #     if last:
+        #         try:
+        #             last_num = int(last.plog_unique_id.replace(self.supplier.code, ""))
+        #         except:
+        #             last_num = 0
+        #     else:
+        #         last_num = 0
+
+        #     new_num = last_num + 1
+        #     self.plog_unique_id = f"{self.supplier.code}{new_num:02d}"
 
             # count = StaffMember.objects.filter(supplier=self.supplier).count() + 1
             # user_code = f"{count:02}"
