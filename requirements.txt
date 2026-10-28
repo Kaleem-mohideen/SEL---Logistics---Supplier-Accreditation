@@ -18,3 +18,4 @@ typing_extensions==4.15.0
 tzdata==2025.2
 whitenoise==6.11.0
 django-extensions==4.1
+celery==5.5.3
